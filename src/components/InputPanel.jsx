@@ -78,9 +78,7 @@ export default function InputPanel({ stats, setStats, clase, setClase }) {
               <Stepper label="Salv. Fuerza" value={stats.sFue} min={-5} max={19} onChange={set('sFue')} hint="De −5 a +19" />
               <Stepper label="Salv. Inteligencia" value={stats.sInt} min={-5} max={19} onChange={set('sInt')} hint="De −5 a +19" />
             </div>
-          </div>
-          <div className="inputs-group res-group">
-            <h2><Shield size={17} /> Resistencias del objetivo</h2>
+            <h3 className="inner-title"><Shield size={16} /> Sus resistencias</h3>
             <div className="res-cols">
               {[RES_TYPES.slice(0, 7), RES_TYPES.slice(7)].map((col, ci) => (
                 <div key={ci}>
