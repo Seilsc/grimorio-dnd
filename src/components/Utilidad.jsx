@@ -1,0 +1,70 @@
+import { useState } from 'react';
+import { Compass, Search } from 'lucide-react';
+import { UTILS, claseLabel } from '../data/spells.js';
+import SpellIcon from './SpellIcon.jsx';
+
+const TAGS = ['control', 'movimiento', 'exploración', 'social', 'información', 'defensa', 'sigilo', 'invocación', 'supervivencia'];
+
+export default function Utilidad({ stats }) {
+  const [q, setQ] = useState('');
+  const [nv, setNv] = useState('todos');
+  const [tag, setTag] = useState('todas');
+
+  const list = UTILS.filter((u) => {
+    if (stats.clase && stats.clase !== 'todas' && !u.clases.includes(stats.clase)) return false;
+    if (nv !== 'todos' && String(u.nivel) !== nv) return false;
+    if (tag !== 'todas' && !u.tags.includes(tag)) return false;
+    if (q && !u.nombre.toLowerCase().includes(q.toLowerCase())) return false;
+    return true;
+  });
+
+  return (
+    <section className="panel" id="utilidad">
+      <div className="section-title">
+        <h2><Compass size={20} /> Utilidad y juego ({list.length})</h2>
+      </div>
+      <p className="muted small">Ni daño ni curación: control, movimiento, información, engaño y supervivencia. Mano de mago incluida.</p>
+      <div className="card uti-filters">
+        <label className="uti-search">
+          <Search size={15} />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar hechizo…" aria-label="Buscar hechizo" />
+        </label>
+        <label>Nivel
+          <select value={nv} onChange={(e) => setNv(e.target.value)}>
+            <option value="todos">Todos</option>
+            <option value="0">Trucos</option>
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((l) => <option key={l} value={String(l)}>Nivel {l}</option>)}
+          </select>
+        </label>
+        <label>Etiqueta
+          <select value={tag} onChange={(e) => setTag(e.target.value)}>
+            <option value="todas">Todas</option>
+            {TAGS.map((t) => <option key={t} value={t}>{t[0].toUpperCase() + t.slice(1)}</option>)}
+          </select>
+        </label>
+      </div>
+      {list.length === 0 && (
+        <div className="card"><p className="muted">Nada con estos filtros: prueba con otra clase, nivel o búsqueda.</p></div>
+      )}
+      <div className="spell-grid">
+        {list.map((u) => (
+          <article key={u.id} className="card spell-card">
+            <div className="spell-head">
+              <span className="spell-icon"><SpellIcon spell={{ ...u, color: '#e8cf7a', icon: u.icon }} size={26} /></span>
+              <div>
+                <h3>{u.nombre}</h3>
+                <div className="spell-badges">
+                  <span className="badge">{u.nivel === 0 ? 'Truco' : `Nv ${u.nivel}`}</span>
+                  <span className="badge lvl">{u.libro}</span>
+                  {u.tags.map((t) => <span key={t} className="badge tag">{t}</span>)}
+                </div>
+                <div className="muted small classes-line">{u.clases.map(claseLabel).join(' · ')}</div>
+              </div>
+            </div>
+            <p className="muted small" style={{ marginTop: 8 }}>{u.desc}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}

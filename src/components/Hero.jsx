@@ -3,11 +3,12 @@ import { Sparkles } from 'lucide-react';
 export default function Hero() {
   return (
     <header className="hero hero-compact">
-      <div className="hero-badge"><Sparkles size={14} /> Grimorio del Excel</div>
-      <h1>Mejor hechizo de daño <span className="gold">según la situación</span></h1>
+      <div className="hero-badge"><Sparkles size={14} /> Grimorio completo</div>
+      <h1>Daño, curación <span className="gold">y utilidad</span></h1>
       <p className="hero-sub">
-        Ajusta tus datos y los del objetivo: el grimorio recalcula qué hechizo
-        hace más daño medio con cada espacio de conjuro.
+        Todos los conjuros, trucos, armas y rasgos oficiales: cuánto pegan,
+        cuánto curan y para qué sirve cada utilidad. Elige tu clase y nivel:
+        solo verás lo que puedes usar.
       </p>
     </header>
   );

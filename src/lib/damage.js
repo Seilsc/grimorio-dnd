@@ -26,7 +26,7 @@ export const caracLanzDe = (stats) => CARAC_LANZ[stats.clase] || 'int';
 export const modLanz = (stats) => modDe(stats[caracLanzDe(stats)]);
 // Armas/rasgos sutiles usan lo mejor entre FUE y DES; el resto, FUE.
 const SUTILES = new Set([
-  'm-daga', 'm-espada-corta', 'm-cimitarra', 'm-estoque',
+  'm-daga', 'm-espada-corta', 'm-cimitarra', 'm-estoque', 'm-latigo',
   'm-artes-marciales', 'm-ataque-furtivo', 'm-floreo', 'm-marca-cazador',
 ]);
 export const modMel = (spec, stats) =>
@@ -239,6 +239,7 @@ export function genericDamage(spec, nivel, ctx) {
   const fijo = (spec.fijo || 0) + (spec.bonoMod ? modLanz(stats) : 0);
   const keys = Object.keys(dice);
   const fijoKey = spec.fijoR || keys[0] || '_';
+  if (fijo && !keys.includes(fijoKey)) keys.push(fijoKey);
 
   const saveMap = {
     des: [ctx.fDes, ctx.pSdes, 'DES'], con: [ctx.fCon, ctx.pScon, 'CON'],
@@ -335,6 +336,43 @@ export function duel(aId, bId, nivel, stats) {
 }
 
 export const fmt = (v) => (v == null ? '–' : (Math.round(v * 10) / 10).toFixed(1));
+
+/**
+ * Curación esperada por objetivo = dados + tu modificador (+fijo / +reserva).
+ * Sin tiradas, críticos ni resistencias. `especial` = efecto no cuantificable.
+ */
+export function curaDe(spec, nivel, stats) {
+  if (nivel < spec.min || nivel > spec.max) {
+    return { dmg: null, lanzable: false, motivo: 'Nivel fuera de rango', prob: null, probLabel: '–', dados: spec.dadosTxt || '–' };
+  }
+  if (spec.especial) {
+    return { dmg: null, lanzable: true, especial: true, motivo: spec.notas, prob: 1, probLabel: 'Efecto especial', dados: spec.dadosTxt || '–' };
+  }
+  const subidas = nivel - spec.min;
+  let avg = 0;
+  for (const p of spec.base || []) avg += p.n * avgDie(p.c);
+  for (const p of spec.step || []) avg += p.n * subidas * avgDie(p.c);
+  avg += spec.fijo || 0;
+  avg += (spec.stepFijo || 0) * subidas;
+  if (spec.dadosPJ) for (const p of spec.dadosPJ(stats.nivelPJ ?? 4)) avg += p.n * avgDie(p.c);
+  if (spec.fijoPJ) avg += spec.fijoPJ(stats.nivelPJ ?? 4);
+  if (!spec.sinMod) avg += modLanz(stats);
+  return { dmg: avg, lanzable: true, prob: 1, probLabel: 'Automática', dados: dadosCura(spec, stats) };
+}
+
+export function dadosCura(spec, stats) {
+  if (spec.dadosTxt) return spec.dadosTxt;
+  const fmtParts = (parts) => (parts || []).map((p) => `${p.n}d${p.c}`).join(' + ');
+  let s = '';
+  if (spec.dadosPJ) s = fmtParts(spec.dadosPJ(stats?.nivelPJ ?? 4));
+  else s = fmtParts(spec.base);
+  if (spec.fijo) s += (s ? '+' : '') + spec.fijo;
+  if (spec.fijoPJ) s += (s ? '+' : '') + `reserva nv. ${stats?.nivelPJ ?? 4}`;
+  if (!spec.sinMod) s += '+mod';
+  if (spec.step?.length) s += ` (+${fmtParts(spec.step)}/nivel)`;
+  if (spec.stepFijo) s += ` (+${spec.stepFijo}/nivel)`;
+  return s || '–';
+}
 
 /**
  * Probabilidad de hacer 0 de daño con ese hechizo y nivel (fiabilidad).

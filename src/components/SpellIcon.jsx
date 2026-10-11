@@ -5,7 +5,13 @@ import {
   Orbit, Moon, Droplets, CloudLightning, Footprints, Wind, Mountain,
   PlugZap, Timer, Sunrise, CloudFog, BrickWall, Cone, Bug, HeartPulse,
   Hand, Target, FlaskConical, Biohazard, Brain, Volume2, Slice,
-  Navigation, Eye, Maximize2, X, LayoutGrid,
+  Navigation, Eye, Maximize2, X, LayoutGrid, Compass, Wrench, Send,
+  BookOpen, Heart, Feather, ArrowUpFromLine, Church, Cloudy, KeyRound,
+  MessageCircle, PersonStanding, EarOff, Glasses, Copy, Lock, VolumeX,
+  Bird, Ban, Gauge, TimerOff, Radar, Expand, Telescope, Rabbit, Squirrel,
+  Archive, Phone, Link, Users, Trees, Image, Network, Box, Megaphone,
+  Layers, Search, Leaf, Drumstick, Cross, Sprout, Smile, ScrollText,
+  Cat, House, Cable, DoorOpen, AlarmClock, CloudSun, VenetianMask,
 } from 'lucide-react';
 
 const MAP = {
@@ -15,7 +21,13 @@ const MAP = {
   Orbit, Moon, Droplets, CloudLightning, Footprints, Wind, Mountain,
   PlugZap, Timer, Sunrise, CloudFog, BrickWall, Cone, Bug, HeartPulse,
   Hand, Target, FlaskConical, Biohazard, Brain, Volume2, Slice,
-  Navigation, Eye, Maximize2, X, LayoutGrid,
+  Navigation, Eye, Maximize2, X, LayoutGrid, Compass, Wrench, Send,
+  BookOpen, Heart, Feather, ArrowUpFromLine, Church, Cloudy, KeyRound,
+  MessageCircle, PersonStanding, EarOff, Glasses, Copy, Lock, VolumeX,
+  Bird, Ban, Gauge, TimerOff, Radar, Expand, Telescope, Rabbit, Squirrel,
+  Archive, Phone, Link, Users, Trees, Image, Network, Box, Megaphone,
+  Layers, Search, Leaf, Drumstick, Cross, Sprout, Smile, ScrollText,
+  Cat, House, Cable, DoorOpen, AlarmClock, CloudSun, VenetianMask,
 };
 
 /**

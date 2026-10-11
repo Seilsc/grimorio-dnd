@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Dices } from 'lucide-react';
 import Hero from './components/Hero.jsx';
+import ApartTabs from './components/ApartTabs.jsx';
 import InputPanel from './components/InputPanel.jsx';
 import Tabs from './components/Tabs.jsx';
 import WinnerBoard from './components/WinnerBoard.jsx';
@@ -9,6 +10,8 @@ import CompareTable from './components/CompareTable.jsx';
 import VisMenu from './components/VisMenu.jsx';
 import DamageChart from './components/DamageChart.jsx';
 import SpellGrid from './components/SpellGrid.jsx';
+import Curacion from './components/Curacion.jsx';
+import Utilidad from './components/Utilidad.jsx';
 import { RES_DEFAULT } from './lib/damage.js';
 import { SPELLS, spellsFor } from './data/spells.js';
 export default function App() {
@@ -22,6 +25,7 @@ export default function App() {
   const [aId, setAId] = useState('bola-fuego');
   const [bId, setBId] = useState('proyectil-magico');
   const [tab, setTab] = useState('mejor');
+  const [apartado, setApartado] = useState('dano');
   const [modo, setModo] = useState('todos');
   const [vis, setVis] = useState(() => Object.fromEntries(SPELLS.map((s) => [s.id, true])));
 
@@ -39,30 +43,40 @@ export default function App() {
 
       <main className="wrap">
         <Hero />
-        <InputPanel stats={stats} setStats={setStats} clase={stats.clase} setClase={setClase} />
-        <Tabs active={tab} onChange={setTab} modo={modo} onModo={setModo} />
-
-        {tab === 'mejor' && (
-          <WinnerBoard nivel={nivel} setNivel={setNivel} stats={stats} ids={ids} ocultos={ocultos} />
-        )}
-        {tab === 'duelo' && (
-          <DuelArena
-            aId={aId} bId={bId} setAId={setAId} setBId={setBId}
-            nivel={nivel} setNivel={setNivel} stats={stats}
-          />
-        )}
-        {tab === 'tabla' && (
+        <ApartTabs active={apartado} onChange={setApartado} />
+        {apartado === 'dano' && (
           <>
-            <VisMenu list={lista} vis={vis} setVis={setVis} />
-            <CompareTable stats={stats} spells={lista} vis={vis} />
-            <DamageChart
-              stats={stats} spells={lista} nivel={nivel}
-              highlight={[aId, bId]} vis={vis} setVis={setVis}
-            />
+            <InputPanel stats={stats} setStats={setStats} clase={stats.clase} setClase={setClase} />
+            <Tabs active={tab} onChange={setTab} modo={modo} onModo={setModo} />
+            {tab === 'mejor' && (
+              <WinnerBoard nivel={nivel} setNivel={setNivel} stats={stats} ids={ids} ocultos={ocultos} />
+            )}
+            {tab === 'duelo' && (
+              <DuelArena
+                aId={aId} bId={bId} setAId={setAId} setBId={setBId}
+                nivel={nivel} setNivel={setNivel} stats={stats}
+              />
+            )}
+            {tab === 'tabla' && (
+              <>
+                <VisMenu list={lista} vis={vis} setVis={setVis} />
+                <CompareTable stats={stats} spells={lista} vis={vis} />
+                <DamageChart
+                  stats={stats} spells={lista} nivel={nivel}
+                  highlight={[aId, bId]} vis={vis} setVis={setVis}
+                />
+              </>
+            )}
+            {tab === 'grimorio' && (
+              <SpellGrid stats={stats} nivel={nivel} spells={lista} />
+            )}
           </>
         )}
-        {tab === 'grimorio' && (
-          <SpellGrid stats={stats} nivel={nivel} spells={lista} />
+        {apartado === 'cura' && (
+          <Curacion stats={stats} />
+        )}
+        {apartado === 'uti' && (
+          <Utilidad stats={stats} />
         )}
       </main>
     </div>

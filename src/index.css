@@ -62,6 +62,44 @@ body {
 
 .wrap { max-width: 1150px; margin: 0 auto; padding: 0 18px 60px; }
 
+/* APARTADOS: Daño / Curación / Utilidad */
+.apart-tabs {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+  margin-top: 18px;
+}
+@media (max-width: 640px) { .apart-tabs { grid-template-columns: 1fr; } }
+.apart {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  background: linear-gradient(180deg, #1d1207, #120b04);
+  border: 1px solid var(--bronze-dark);
+  border-radius: 8px; padding: 12px 10px;
+  color: var(--parch-deep); cursor: pointer;
+  box-shadow: 0 6px 16px #00000088;
+}
+.apart:hover { color: var(--gold-soft); border-color: var(--bronze); }
+.apart.active {
+  background: linear-gradient(180deg, var(--parch), var(--parch2));
+  color: var(--ink); border-color: var(--gold);
+  box-shadow: 0 0 14px #c9a22766;
+}
+.apart-label { font-family: 'Cinzel Decorative', 'Cinzel', serif; font-weight: 900; font-size: 19px; }
+.apart-desc { font-size: 12.5px; font-style: italic; opacity: 0.8; }
+.apart.active .apart-desc { color: var(--muted); }
+
+/* Subtítulos dentro de sección */
+.sub-h2 { margin-top: 22px !important; }
+
+/* Filtros de utilidad */
+.uti-filters { display: flex; gap: 14px; align-items: end; flex-wrap: wrap; margin: 8px 4px 0; }
+.uti-filters label { display: grid; gap: 4px; font-size: 13px; font-weight: 700; color: var(--ink); font-family: 'Cinzel', serif; }
+.uti-search { flex: 1; min-width: 200px; display: flex; align-items: center; gap: 7px; color: var(--ink); }
+.uti-search input {
+  flex: 1; font-family: 'Alegreya', serif; font-size: 15px;
+  background: var(--leather); color: var(--parch);
+  border: 1px solid var(--bronze-dark); border-radius: 6px; padding: 7px 10px;
+}
+.badge.tag { border-color: var(--bronze); color: var(--gold-soft); font-style: italic; }
+
 /* PESTAÑAS: chapas de cuero con remaches + modos */
 .tabs-wrap { position: sticky; top: 55px; z-index: 40; margin-top: 18px; }
 .tabs {
