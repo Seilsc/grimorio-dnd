@@ -40,7 +40,7 @@ export default function InputPanel({ stats, setStats, clase, setClase }) {
       {open && (
         <div className="inputs-grid">
           <div className="inputs-group">
-            <h2><User size={17} /> Tu lanzador</h2>
+            <h2><User size={17} /> Tu personaje</h2>
             <label className="class-label">Clase de tu personaje
               <select value={clase} onChange={(e) => setClase(e.target.value)}>
                 {CLASES.map((c) => <option key={c.key} value={c.key}>{c.label}</option>)}

@@ -198,7 +198,7 @@ code {
 .inputs-summary { display: inline-flex; align-items: center; gap: 8px; color: var(--ink); }
 .chev { transition: transform 0.2s; color: var(--bronze-dark); }
 .chev.up { transform: rotate(180deg); }
-.inputs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 0 18px 18px; }
+.inputs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 0 18px 18px; align-items: start; }
 @media (max-width: 800px) { .inputs-grid { grid-template-columns: 1fr; } }
 .inputs-group.res-group { grid-column: 1 / -1; }
 .res-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 26px; }
