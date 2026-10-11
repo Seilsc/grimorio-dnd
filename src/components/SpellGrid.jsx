@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
 import { SPELLS } from '../data/spells.js';
 import { spellDamage, fmt } from '../lib/damage.js';
+import SpellIcon from './SpellIcon.jsx';
 
 const FILTROS = [
   { id: 'todos', label: 'Todos' },
@@ -21,7 +23,7 @@ export default function SpellGrid({ stats, nivel }) {
   return (
     <section className="panel" id="grimorio">
       <div className="section-title">
-        <h2>📖 Grimorio · fichas de hechizo</h2>
+        <h2><BookOpen size={20} /> Grimorio · fichas de hechizo</h2>
         <div className="chips">
           {FILTROS.map((f) => (
             <button key={f.id} className={`chip ${filtro === f.id ? 'on' : ''}`} onClick={() => setFiltro(f.id)}>
@@ -38,7 +40,7 @@ export default function SpellGrid({ stats, nivel }) {
           return (
             <article key={s.id} className="card spell-card">
               <div className="spell-head">
-                <span className="spell-icon">{s.icono}</span>
+                <span className="spell-icon"><SpellIcon spell={s} size={30} /></span>
                 <div>
                   <h3>{s.nombre}</h3>
                   <div className="spell-badges">
@@ -60,7 +62,7 @@ export default function SpellGrid({ stats, nivel }) {
               </div>
               <p className="muted small">{s.notas}</p>
               <button className="link" onClick={() => setAbierto(open ? null : s.id)}>
-                {open ? 'Ocultar detalle ▲' : 'Ver detalle por nivel ▼'}
+                {open ? <>Ocultar detalle <ChevronUp size={13} /></> : <>Ver detalle por nivel <ChevronDown size={13} /></>}
               </button>
               {open && (
                 <table className="mini">

@@ -1,5 +1,7 @@
+import { Table2, Crown } from 'lucide-react';
 import { SPELLS } from '../data/spells.js';
 import { fullMatrix, bestAndSecond, fmt } from '../lib/damage.js';
+import SpellIcon from './SpellIcon.jsx';
 
 export default function CompareTable({ stats }) {
   const matrix = fullMatrix(stats);
@@ -14,8 +16,8 @@ export default function CompareTable({ stats }) {
 
   return (
     <section className="panel" id="tabla">
-      <h2>📊 Daño medio de cada hechizo contra este objetivo</h2>
-      <p className="muted small">« – » = no se puede lanzar con ese espacio. La celda dorada 👑 es la mejor de su columna.</p>
+      <h2><Table2 size={20} /> Daño medio de cada hechizo contra este objetivo</h2>
+      <p className="muted small">« – » = no se puede lanzar con ese espacio. La celda dorada es la mejor de su columna.</p>
       <div className="table-wrap">
         <table className="compare">
           <thead>
@@ -29,7 +31,7 @@ export default function CompareTable({ stats }) {
             {SPELLS.map((s) => (
               <tr key={s.id}>
                 <td className="sticky">
-                  <span className="cell-name">{s.icono} {s.nombre}</span>
+                  <span className="cell-name"><SpellIcon spell={s} size={15} /> {s.nombre}</span>
                   <span className="cell-sub" style={{ '--c': s.color }}>{s.tipoDano} · Nv {s.nivelMin}{s.nivelMin !== s.nivelMax ? `–${s.nivelMax}` : ''}</span>
                 </td>
                 <td><span className="badge">{s.tiradaLabel}</span></td>
@@ -42,7 +44,7 @@ export default function CompareTable({ stats }) {
                   return (
                     <td key={l} className={isBest ? 'best' : ''} title={`${s.nombre} N${l}: ${r.dados} · ${r.probLabel}\n${s.notas}`}>
                       <div className="heat" style={{ opacity: 0.15 + intensity * 0.85 }} />
-                      {isBest && <span className="crown">👑 </span>}{fmt(r.dmg)}
+                      {isBest && <Crown size={12} className="crown-icon" />}{fmt(r.dmg)}
                     </td>
                   );
                 })}

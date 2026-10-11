@@ -1,11 +1,12 @@
 // Datos fieles al Excel hechizos_de_dungeons_and_dragons.xlsx
 // nivelBase = nivel al que aplica dadosBase. Fuera de [nivelMin, nivelMax] => no lanzable ("–").
+// icon = nombre de icono Lucide (ver components/SpellIcon.jsx).
 
 export const SPELLS = [
   {
     id: 'bola-fuego',
     nombre: 'Bola de fuego',
-    icono: '🔥',
+    icon: 'Flame',
     nivelMin: 3, nivelMax: 9, nivelBase: 3,
     tirada: 'salv-des', tiradaLabel: 'Salvación DES',
     tipoDano: 'fuego', color: '#f97316',
@@ -16,7 +17,7 @@ export const SPELLS = [
   {
     id: 'causar-heridas',
     nombre: 'Causar heridas',
-    icono: '🗡️',
+    icon: 'Sword',
     nivelMin: 1, nivelMax: 9, nivelBase: 1,
     tirada: 'ataque', tiradaLabel: 'Ataque (CA)',
     tipoDano: 'necrótico', color: '#a855f7',
@@ -26,7 +27,7 @@ export const SPELLS = [
   {
     id: 'cuchillo-hielo',
     nombre: 'Cuchillo de hielo',
-    icono: '❄️',
+    icon: 'Snowflake',
     nivelMin: 1, nivelMax: 9, nivelBase: 1,
     tirada: 'mixto', tiradaLabel: 'Ataque + salv. DES',
     tipoDano: 'perforante + frío', color: '#38bdf8',
@@ -37,7 +38,7 @@ export const SPELLS = [
   {
     id: 'dedo-muerte',
     nombre: 'Dedo de la muerte',
-    icono: '☠️',
+    icon: 'Skull',
     nivelMin: 7, nivelMax: 7, nivelBase: 7,
     tirada: 'salv-con', tiradaLabel: 'Salvación CON',
     tipoDano: 'necrótico', color: '#a855f7',
@@ -47,7 +48,7 @@ export const SPELLS = [
   {
     id: 'desintegrar',
     nombre: 'Desintegrar',
-    icono: '⚡',
+    icon: 'Atom',
     nivelMin: 6, nivelMax: 9, nivelBase: 6,
     tirada: 'salv-des', tiradaLabel: 'Salvación DES',
     tipoDano: 'fuerza', color: '#60a5fa',
@@ -57,7 +58,7 @@ export const SPELLS = [
   {
     id: 'lluvia-meteoritos',
     nombre: 'Lluvia de meteoritos',
-    icono: '🌠',
+    icon: 'CloudHail',
     nivelMin: 9, nivelMax: 9, nivelBase: 9,
     tirada: 'salv-des', tiradaLabel: 'Salvación DES',
     tipoDano: 'fuego + contundente', color: '#ef4444',
@@ -68,7 +69,7 @@ export const SPELLS = [
   {
     id: 'manos-ardientes',
     nombre: 'Manos ardientes',
-    icono: '🔥',
+    icon: 'FlameKindling',
     nivelMin: 1, nivelMax: 9, nivelBase: 1,
     tirada: 'salv-des', tiradaLabel: 'Salvación DES',
     tipoDano: 'fuego', color: '#f97316',
@@ -78,7 +79,7 @@ export const SPELLS = [
   {
     id: 'marchitar',
     nombre: 'Marchitar',
-    icono: '💀',
+    icon: 'Ghost',
     nivelMin: 4, nivelMax: 9, nivelBase: 4,
     tirada: 'salv-con', tiradaLabel: 'Salvación CON',
     tipoDano: 'necrótico', color: '#a855f7',
@@ -88,7 +89,7 @@ export const SPELLS = [
   {
     id: 'orbe-cromatico',
     nombre: 'Orbe cromático',
-    icono: '🔮',
+    icon: 'CircleDot',
     nivelMin: 1, nivelMax: 9, nivelBase: 1,
     tirada: 'ataque', tiradaLabel: 'Ataque (CA)',
     tipoDano: 'a elegir', color: '#2dd4bf',
@@ -98,7 +99,7 @@ export const SPELLS = [
   {
     id: 'proyectil-magico',
     nombre: 'Proyectil mágico',
-    icono: '✨',
+    icon: 'WandSparkles',
     nivelMin: 1, nivelMax: 9, nivelBase: 1,
     tirada: 'auto', tiradaLabel: 'Automático',
     tipoDano: 'fuerza', color: '#60a5fa',
@@ -108,7 +109,7 @@ export const SPELLS = [
   {
     id: 'rayo-abrasador',
     nombre: 'Rayo abrasador',
-    icono: '☄️',
+    icon: 'Zap',
     nivelMin: 2, nivelMax: 9, nivelBase: 2,
     tirada: 'ataque', tiradaLabel: 'Ataque (CA)',
     tipoDano: 'fuego', color: '#f97316',
@@ -118,7 +119,7 @@ export const SPELLS = [
   {
     id: 'virote-guia',
     nombre: 'Virote guía',
-    icono: '🏹',
+    icon: 'Crosshair',
     nivelMin: 1, nivelMax: 9, nivelBase: 1,
     tirada: 'ataque', tiradaLabel: 'Ataque (CA)',
     tipoDano: 'radiante', color: '#facc15',

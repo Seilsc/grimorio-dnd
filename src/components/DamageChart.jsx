@@ -2,8 +2,10 @@ import { useMemo, useState } from 'react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
+import { TrendingUp } from 'lucide-react';
 import { SPELLS } from '../data/spells.js';
 import { spellDamage } from '../lib/damage.js';
+import SpellIcon from './SpellIcon.jsx';
 
 const PALETTE = ['#f59e0b', '#ef4444', '#38bdf8', '#a855f7', '#4ade80', '#fb923c', '#facc15', '#60a5fa', '#2dd4bf', '#f87171', '#c084fc', '#94a3b8'];
 
@@ -29,7 +31,7 @@ export default function DamageChart({ stats, highlight = [] }) {
 
   return (
     <section className="panel" id="grafico">
-      <h2>📈 Curvas de daño por nivel de espacio</h2>
+      <h2><TrendingUp size={20} /> Curvas de daño por nivel de espacio</h2>
       <p className="muted small">Activa/desactiva hechizos. Los del duelo aparecen con línea gruesa.</p>
       <div className="chips">
         {SPELLS.map((s, i) => (
@@ -39,7 +41,7 @@ export default function DamageChart({ stats, highlight = [] }) {
             style={{ '--c': PALETTE[i % PALETTE.length] }}
             onClick={() => toggle(s.id)}
           >
-            {s.icono} {s.nombre}
+            <SpellIcon spell={s} size={13} /> {s.nombre}
           </button>
         ))}
       </div>
@@ -58,7 +60,7 @@ export default function DamageChart({ stats, highlight = [] }) {
                 key={s.id}
                 type="monotone"
                 dataKey={s.id}
-                name={`${s.icono} ${s.nombre}`}
+                name={s.nombre}
                 stroke={PALETTE[SPELLS.indexOf(s) % PALETTE.length]}
                 strokeWidth={highlight.includes(s.id) ? 3.5 : 1.8}
                 dot={false}
