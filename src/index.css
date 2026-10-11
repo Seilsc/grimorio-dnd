@@ -202,14 +202,25 @@ code {
 .inputs-summary .muted { color: var(--parch-deep); font-family: 'Alegreya', serif; font-weight: 400; }
 .chev { transition: transform 0.2s; color: var(--parch-deep); }
 .chev.up { transform: rotate(180deg); }
-.inputs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 14px 2px 0; align-items: start; }
-@media (max-width: 800px) { .inputs-grid { grid-template-columns: 1fr; } }
+.inputs-grid { display: grid; grid-template-columns: 1fr; gap: 14px; padding: 14px 2px 0; }
+/* Hoja de personaje densa: filas siempre llenas, sin huecos */
+.char-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; align-items: end; }
+.scores-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0 10px; }
+.saves-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0 14px; }
+@media (max-width: 1000px) {
+  .scores-grid { grid-template-columns: repeat(3, 1fr); }
+  .saves-grid { grid-template-columns: repeat(3, 1fr); }
+  .char-row { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .scores-grid { grid-template-columns: repeat(2, 1fr); }
+  .saves-grid { grid-template-columns: repeat(2, 1fr); }
+}
 .inputs-group.res-group { grid-column: 1 / -1; }
 .res-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 26px; }
 @media (max-width: 800px) { .res-cols { grid-template-columns: 1fr; } }
 
 /* Puntuaciones compactas (sin slider) */
-.scores-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
 .stepper.compact { margin: 7px 0; }
 .stepper.compact .step-btn { width: 28px; height: 28px; border-radius: 8px; }
 .stepper.compact .step-value { min-width: 44px; font-size: 16px; padding: 1px 8px; }

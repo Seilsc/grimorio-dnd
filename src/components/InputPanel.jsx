@@ -41,11 +41,14 @@ export default function InputPanel({ stats, setStats, clase, setClase }) {
         <div className="inputs-grid">
           <div className="inputs-group">
             <h2><User size={17} /> Tu personaje</h2>
-            <label className="class-label">Clase de tu personaje
-              <select value={clase} onChange={(e) => setClase(e.target.value)}>
-                {CLASES.map((c) => <option key={c.key} value={c.key}>{c.label}</option>)}
-              </select>
-            </label>
+            <div className="char-row">
+              <label className="class-label">Clase de tu personaje
+                <select value={clase} onChange={(e) => setClase(e.target.value)}>
+                  {CLASES.map((c) => <option key={c.key} value={c.key}>{c.label}</option>)}
+                </select>
+              </label>
+              <Stepper label="Nivel de personaje" value={stats.nivelPJ ?? 4} min={1} max={20} onChange={set('nivelPJ')} plain hint="Competencia, trucos, rasgos…" />
+            </div>
             {(clase === 'caballero' || clase === 'picaro-arcano') && (
               <p className="muted small">Usa la lista de mago como aproximación (en mesa se limita por escuela).</p>
             )}
@@ -57,7 +60,6 @@ export default function InputPanel({ stats, setStats, clase, setClase }) {
                 />
               ))}
             </div>
-            <Stepper label="Nivel de personaje" value={stats.nivelPJ ?? 4} min={1} max={20} onChange={set('nivelPJ')} plain hint="Competencia, trucos, rasgos…" />
             <div className="derived">
               <div><Target size={14} /> Ataque <b>+{bono}</b></div>
               <div><ShieldHalf size={14} /> CD <b>{dc}</b> <span className="muted small">({carac})</span></div>
@@ -68,11 +70,13 @@ export default function InputPanel({ stats, setStats, clase, setClase }) {
           <div className="inputs-group">
             <h2><Skull size={17} /> El objetivo</h2>
             <Stepper label="Clase de armadura" value={stats.ca} min={1} max={39} onChange={set('ca')} plain hint="De 1 a 39" />
-            <Stepper label="Salv. Destreza" value={stats.sDes} min={-5} max={19} onChange={set('sDes')} hint="De −5 a +19" />
-            <Stepper label="Salv. Constitución" value={stats.sCon} min={-5} max={19} onChange={set('sCon')} hint="De −5 a +19" />
-            <Stepper label="Salv. Sabiduría" value={stats.sSab} min={-5} max={19} onChange={set('sSab')} hint="De −5 a +19" />
-            <Stepper label="Salv. Fuerza" value={stats.sFue} min={-5} max={19} onChange={set('sFue')} hint="De −5 a +19" />
-            <Stepper label="Salv. Inteligencia" value={stats.sInt} min={-5} max={19} onChange={set('sInt')} hint="De −5 a +19" />
+            <div className="saves-grid">
+              <Stepper label="Salv. Destreza" value={stats.sDes} min={-5} max={19} onChange={set('sDes')} hint="De −5 a +19" />
+              <Stepper label="Salv. Constitución" value={stats.sCon} min={-5} max={19} onChange={set('sCon')} hint="De −5 a +19" />
+              <Stepper label="Salv. Sabiduría" value={stats.sSab} min={-5} max={19} onChange={set('sSab')} hint="De −5 a +19" />
+              <Stepper label="Salv. Fuerza" value={stats.sFue} min={-5} max={19} onChange={set('sFue')} hint="De −5 a +19" />
+              <Stepper label="Salv. Inteligencia" value={stats.sInt} min={-5} max={19} onChange={set('sInt')} hint="De −5 a +19" />
+            </div>
           </div>
           <div className="inputs-group res-group">
             <h2><Shield size={17} /> Resistencias del objetivo</h2>
