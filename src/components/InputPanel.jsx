@@ -14,7 +14,7 @@ const SCORES = [
   { key: 'car', label: 'Carisma' },
 ];
 
-export default function InputPanel({ stats, setStats, clase, setClase }) {
+export default function InputPanel({ stats, setStats, clase, setClase, apartado = 'dano' }) {
   const [open, setOpen] = useState(true);
   const set = (k) => (v) => setStats((s) => ({ ...s, [k]: v }));
   const mod = modLanz(stats);
@@ -53,21 +53,29 @@ export default function InputPanel({ stats, setStats, clase, setClase }) {
             {(clase === 'caballero' || clase === 'picaro-arcano') && (
               <p className="muted small">Usa la lista de mago como aproximación (en mesa se limita por escuela).</p>
             )}
-            <div className="scores-grid">
-              {SCORES.map((c) => (
-                <Stepper
-                  key={c.key} label={`${c.label} (${modDe(stats[c.key]) >= 0 ? `+${modDe(stats[c.key])}` : modDe(stats[c.key])})`}
-                  value={stats[c.key]} min={1} max={30} onChange={set(c.key)} plain slider={false}
-                />
-              ))}
-            </div>
-            <div className="derived">
-              <div><Target size={14} /> Ataque <b>+{bono}</b></div>
-              <div><ShieldHalf size={14} /> CD <b>{dc}</b> <span className="muted small">({carac})</span></div>
-              <div><Swords size={14} /> Melé <b>+{mel + comp}</b> · <b>{golpes}</b> golpe{golpes > 1 ? 's' : ''}</div>
-              <div className="muted small">Nv{stats.nivelPJ} · Comp +{comp}{esp != null && (esp > 0 ? <> · Espacio <b>N{esp}</b></> : ' · Sin espacios')}</div>
-            </div>
+            {apartado !== 'uti' && (
+              <>
+                <div className="scores-grid">
+                  {SCORES.map((c) => (
+                    <Stepper
+                      key={c.key} label={`${c.label} (${modDe(stats[c.key]) >= 0 ? `+${modDe(stats[c.key])}` : modDe(stats[c.key])})`}
+                      value={stats[c.key]} min={1} max={30} onChange={set(c.key)} plain slider={false}
+                    />
+                  ))}
+                </div>
+                <div className="char-row">
+                  <Stepper label="Nivel de personaje" value={stats.nivelPJ ?? 4} min={1} max={20} onChange={set('nivelPJ')} plain hint="Competencia, trucos, rasgos…" />
+                  <div className="derived">
+                    <div><Target size={14} /> Ataque <b>+{bono}</b></div>
+                    <div><ShieldHalf size={14} /> CD <b>{dc}</b> <span className="muted small">({carac})</span></div>
+                    <div><Swords size={14} /> Melé <b>+{mel + comp}</b> · <b>{golpes}</b> golpe{golpes > 1 ? 's' : ''}</div>
+                    <div className="muted small">Nv{stats.nivelPJ} · Comp +{comp}{esp != null && (esp > 0 ? <> · Espacio <b>N{esp}</b></> : ' · Sin espacios')}</div>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
+          {apartado === 'dano' && (
           <div className="inputs-group">
             <h2><Skull size={17} /> El objetivo</h2>
             <Stepper label="Clase de armadura" value={stats.ca} min={1} max={39} onChange={set('ca')} plain hint="De 1 a 39" />
@@ -111,6 +119,7 @@ export default function InputPanel({ stats, setStats, clase, setClase }) {
               ))}
             </div>
           </div>
+          )}
         </div>
       )}
     </section>

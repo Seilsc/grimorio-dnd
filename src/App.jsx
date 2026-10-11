@@ -43,10 +43,10 @@ export default function App() {
 
       <main className="wrap">
         <Hero />
+        <InputPanel stats={stats} setStats={setStats} clase={stats.clase} setClase={setClase} apartado={apartado} />
         <ApartTabs active={apartado} onChange={setApartado} />
         {apartado === 'dano' && (
           <>
-            <InputPanel stats={stats} setStats={setStats} clase={stats.clase} setClase={setClase} />
             <Tabs active={tab} onChange={setTab} modo={modo} onModo={setModo} />
             {tab === 'mejor' && (
               <WinnerBoard nivel={nivel} setNivel={setNivel} stats={stats} ids={ids} ocultos={ocultos} />

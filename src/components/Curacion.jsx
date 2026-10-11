@@ -9,6 +9,15 @@ import {
 import { CURAS, claseLabel } from '../data/spells.js';
 import { curaDe, fmt, modLanz, caracLanzDe } from '../lib/damage.js';
 import SpellIcon from './SpellIcon.jsx';
+import Tabs from './Tabs.jsx';
+import { Crown as CrownIcon, Swords as SwordsIcon, Table2 as Table2Icon, BookOpen as BookOpenIcon } from 'lucide-react';
+
+const CURA_TABS = [
+  { id: 'mejor', label: 'Mejor curación', icon: CrownIcon },
+  { id: 'duelo', label: 'Duelo 1v1', icon: SwordsIcon },
+  { id: 'tabla', label: 'Comparativa', icon: Table2Icon },
+  { id: 'grimorio', label: 'Grimorio', icon: BookOpenIcon },
+];
 
 const ADICIONAL = new Set(['c-palabra-curativa', 'c-palabra-masa', 'c-luz-curativa']);
 
@@ -173,6 +182,7 @@ function CuraChart({ stats, lista }) {
 
 export default function Curacion({ stats }) {
   const [nivel, setNivel] = useState(1);
+  const [tab, setTab] = useState('mejor');
   const lista = curasDe(stats.clase);
   const levels = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
@@ -190,17 +200,13 @@ export default function Curacion({ stats }) {
     <section className="panel" id="curacion">
       <div className="section-title">
         <h2><HeartPulse size={20} /> Quién cura más por nivel de espacio</h2>
-        <div className="lvl-tabs">
-          {levels.map((l) => (
-            <button key={l} className={l === nivel ? 'active' : ''} onClick={() => setNivel(l)}>
-              N{l}
-            </button>
-          ))}
-        </div>
       </div>
       <p className="muted small">Curación media por objetivo (dados + tu modificador). Sin tiradas ni resistencias.</p>
+      <Tabs active={tab} onChange={setTab} items={CURA_TABS} />
 
-      <div className="podium">
+      {tab === 'mejor' && (
+        <>
+          <div className="podium">
         {levels.map((l) => {
           const b = best(l);
           return (
@@ -273,10 +279,16 @@ export default function Curacion({ stats }) {
           </ul>
         </div>
       )}
+        </>
+      )}
 
-      <CuraDuel stats={stats} nivel={nivel} lista={lista} />
+      {tab === 'duelo' && (
+        <CuraDuel stats={stats} nivel={nivel} lista={lista} />
+      )}
 
-      <h2 className="sub-h2"><Table2 size={20} /> Curación media por nivel</h2>
+      {tab === 'tabla' && (
+        <>
+          <h2 className="sub-h2"><Table2 size={20} /> Curación media por nivel</h2>
       <div className="table-wrap">
         <table className="compare">
           <thead>
@@ -307,8 +319,12 @@ export default function Curacion({ stats }) {
       </div>
 
       <CuraChart stats={stats} lista={lista} />
+        </>
+      )}
 
-      <h2 className="sub-h2"><BookOpen size={20} /> Fichas de curación</h2>
+      {tab === 'grimorio' && (
+        <>
+          <h2 className="sub-h2"><BookOpen size={20} /> Fichas de curación</h2>
       <div className="spell-grid">
         {lista.map((c) => {
           const r = curaDe(c, nivel, stats);
@@ -342,6 +358,8 @@ export default function Curacion({ stats }) {
           );
         })}
       </div>
+        </>
+      )}
     </section>
   );
 }
