@@ -18,7 +18,7 @@ const FILTROS = [
   { id: 'mixto', label: 'Mixto' },
 ];
 
-export default function SpellGrid({ stats, nivel, spells }) {
+export default function SpellGrid({ stats, nivel, spells, niveles = [1, 2, 3, 4, 5, 6, 7, 8, 9] }) {
   const base = spells ?? SPELLS;
   const [filtro, setFiltro] = useState('todos');
   const [abierto, setAbierto] = useState(null);
@@ -82,7 +82,7 @@ export default function SpellGrid({ stats, nivel, spells }) {
                 <table className="mini">
                   <thead><tr><th>Nv</th><th>Dados</th><th>Daño</th><th>Prob.</th></tr></thead>
                   <tbody>
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((l) => {
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9].filter((l) => niveles.includes(l)).map((l) => {
                       const rr = spellDamage(s, l, stats);
                       return (
                         <tr key={l} className={l === nivel ? 'hl' : ''}>

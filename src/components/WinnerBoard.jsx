@@ -134,8 +134,8 @@ function RuptureCard({ nivel, stats, defaultVar, ids }) {
   );
 }
 
-export default function WinnerBoard({ nivel, setNivel, stats, ids, ocultos = 0 }) {
-  const levels = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+export default function WinnerBoard({ nivel, setNivel, stats, ids, ocultos = 0, niveles = [1, 2, 3, 4, 5, 6, 7, 8, 9], maxSlot = 9 }) {
+  const levels = niveles;
   const { best, second } = bestAndSecond(nivel, stats, ids);
   const top5 = compareAtLevel(nivel, stats, ids).slice(0, 5);
   const maxTop = top5[0]?.dmg || 1;
@@ -158,6 +158,9 @@ export default function WinnerBoard({ nivel, setNivel, stats, ids, ocultos = 0 }
             ? <>solo llega a espacios de N{espacioMaximo(stats.clase, stats.nivelPJ)}</>
             : 'no tiene espacios de conjuro'}: {ocultos} opcion{ocultos > 1 ? 'es' : ''} oculta{ocultos > 1 ? 's' : ''}. Sube de nivel para ver más.
         </p>
+      )}
+      {maxSlot === 0 && (
+        <p className="muted small">Sin espacios de conjuro: valores de referencia sin gastar recursos (trucos y melé).</p>
       )}
 
       {/* Podio completo 1-9 */}

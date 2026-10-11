@@ -41,7 +41,7 @@ function ChartBody({ data, list, visible, highlight, height, showLegend = true }
   );
 }
 
-export default function DamageChart({ stats, spells, nivel = 3, highlight = [], vis, setVis }) {
+export default function DamageChart({ stats, spells, nivel = 3, highlight = [], vis, setVis, niveles = [1, 2, 3, 4, 5, 6, 7, 8, 9] }) {
   const list = spells ?? SPELLS;
   const ids = list.map((s) => s.id);
   const visible = vis ?? Object.fromEntries(ids.map((id) => [id, true]));
@@ -49,7 +49,7 @@ export default function DamageChart({ stats, spells, nivel = 3, highlight = [], 
 
   const data = useMemo(() => {
     const rows = [];
-    for (let lvl = 1; lvl <= 9; lvl++) {
+    for (const lvl of niveles) {
       const row = { nivel: `N${lvl}` };
       for (const s of list) {
         const r = spellDamage(s, lvl, stats);
@@ -59,7 +59,7 @@ export default function DamageChart({ stats, spells, nivel = 3, highlight = [], 
     }
     return rows;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stats, nivel, list.length, ids.join(',')]);
+  }, [stats, nivel, list.length, ids.join(','), niveles.join(',')]);
 
   const onlyTop5 = () => {
     if (!setVis) return;

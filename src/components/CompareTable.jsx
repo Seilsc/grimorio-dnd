@@ -4,12 +4,12 @@ import { fullMatrix, bestAndSecond, fmt } from '../lib/damage.js';
 import SpellIcon from './SpellIcon.jsx';
 import SpellLink from './SpellLink.jsx';
 
-export default function CompareTable({ stats, spells, vis }) {
+export default function CompareTable({ stats, spells, vis, niveles = [1, 2, 3, 4, 5, 6, 7, 8, 9] }) {
   const list = spells ?? SPELLS;
   const ids = list.map((s) => s.id);
   const shownMap = vis ?? Object.fromEntries(ids.map((id) => [id, true]));
   const matrix = fullMatrix(stats, ids);
-  const levels = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  const levels = niveles;
 
   const maxByLvl = {};
   const bestByLvl = {};
@@ -37,7 +37,7 @@ export default function CompareTable({ stats, spells, vis }) {
           </thead>
           <tbody>
             {shown.length === 0 && (
-              <tr><td colSpan={11} className="muted" style={{ padding: 18 }}>Activa al menos un conjuro arriba para ver la tabla.</td></tr>
+              <tr><td colSpan={levels.length + 2} className="muted" style={{ padding: 18 }}>Activa al menos un conjuro arriba para ver la tabla.</td></tr>
             )}
             {shown.map((s) => (
               <tr key={s.id}>

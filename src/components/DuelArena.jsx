@@ -36,7 +36,7 @@ function DuelCard({ R, side, isWinner, onPick, max }) {
   );
 }
 
-export default function DuelArena({ aId, bId, setAId, setBId, nivel, setNivel, stats }) {
+export default function DuelArena({ aId, bId, setAId, setBId, nivel, setNivel, stats, niveles = [1, 2, 3, 4, 5, 6, 7, 8, 9] }) {
   const { A, B, ganador, diff, pct } = duel(aId, bId, nivel, stats);
   const max = Math.max(A.dmg ?? 0, B.dmg ?? 0, 0.01);
   const bonoD = attackBonus(modLanz(stats), compDe(stats));
@@ -60,7 +60,7 @@ export default function DuelArena({ aId, bId, setAId, setBId, nivel, setNivel, s
         <div className="duel-controls">
           <label>Nivel
             <select value={nivel} onChange={(e) => setNivel(Number(e.target.value))}>
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((l) => <option key={l} value={l}>Espacio {l}</option>)}
+              {niveles.map((l) => <option key={l} value={l}>Espacio {l}</option>)}
             </select>
           </label>
           <button className="swap" onClick={swap}><ArrowLeftRight size={15} /> Intercambiar</button>

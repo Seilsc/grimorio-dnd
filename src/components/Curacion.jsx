@@ -11,6 +11,7 @@ import { curaDe, fmt, modLanz, caracLanzDe } from '../lib/damage.js';
 import SpellIcon from './SpellIcon.jsx';
 import SpellLink, { BookLink } from './SpellLink.jsx';
 import Ficha from './Ficha.jsx';
+import VisMenu from './VisMenu.jsx';
 import Tabs from './Tabs.jsx';
 import { Crown as CrownIcon, Swords as SwordsIcon, Table2 as Table2Icon, BookOpen as BookOpenIcon } from 'lucide-react';
 
@@ -121,11 +122,11 @@ function CuraDuel({ stats, nivel, lista }) {
   );
 }
 
-function CuraChart({ stats, lista }) {
+function CuraChart({ stats, lista, vis, niveles }) {
   const [expand, setExpand] = useState(false);
   const data = useMemo(() => {
     const rows = [];
-    for (let lvl = 1; lvl <= 9; lvl++) {
+    for (const lvl of niveles) {
       const row = { nivel: `N${lvl}` };
       for (const c of lista) {
         const r = curaDe(c, lvl, stats);
@@ -135,8 +136,8 @@ function CuraChart({ stats, lista }) {
     }
     return rows;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stats, lista.length]);
-  const conDatos = lista.filter((c) => !c.especial);
+  }, [stats, lista.length, niveles.join(',')]);
+  const conDatos = lista.filter((c) => !c.especial && (vis?.[c.id] ?? true));
 
   const body = (height, showLegend) => (
     <ResponsiveContainer width="100%" height={height}>
@@ -183,11 +184,13 @@ function CuraChart({ stats, lista }) {
   );
 }
 
-export default function Curacion({ stats }) {
+export default function Curacion({ stats, vis, setVis, niveles = [1, 2, 3, 4, 5, 6, 7, 8, 9] }) {
   const [nivel, setNivel] = useState(1);
   const [tab, setTab] = useState('mejor');
   const lista = curasDe(stats.clase);
-  const levels = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  const levels = niveles;
+  const shownMap = vis ?? {};
+  const shown = lista.filter((c) => shownMap[c.id] ?? true);
 
   const rank = (l) => lista
     .map((c) => ({ spec: c, ...curaDe(c, l, stats) }))
@@ -291,6 +294,7 @@ export default function Curacion({ stats }) {
 
       {tab === 'tabla' && (
         <>
+          <VisMenu list={lista} vis={shownMap} setVis={setVis} />
           <h2 className="sub-h2"><Table2 size={20} /> Curación media por nivel</h2>
       <div className="table-wrap">
         <table className="compare">
@@ -302,7 +306,10 @@ export default function Curacion({ stats }) {
             </tr>
           </thead>
           <tbody>
-            {lista.map((c) => (
+            {shown.length === 0 && (
+              <tr><td colSpan={levels.length + 2} className="muted" style={{ padding: 18 }}>Activa al menos una curación arriba para ver la tabla.</td></tr>
+            )}
+            {shown.map((c) => (
               <tr key={c.id}>
                 <td className="sticky">
                   <span className="cell-name"><SpellIcon spell={{ ...c, color: '#4ade80', icon: c.icon }} size={15} /> {c.nombre}</span>
@@ -321,7 +328,7 @@ export default function Curacion({ stats }) {
         </table>
       </div>
 
-      <CuraChart stats={stats} lista={lista} />
+      <CuraChart stats={stats} lista={lista} vis={vis} niveles={niveles} />
         </>
       )}
 
