@@ -27,7 +27,7 @@ export default function InputPanel({ stats, setStats, clase, setClase }) {
   const carac = caracLanzDe(stats).toUpperCase();
 
   return (
-    <section className="card inputs-card" id="datos">
+    <section className="inputs-wrap" id="datos">
       <button className="inputs-toggle" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
         <span className="inputs-summary">
           <SlidersHorizontal size={16} /> Personalizar datos
