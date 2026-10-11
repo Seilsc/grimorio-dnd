@@ -9,7 +9,7 @@ function DuelCard({ R, side, isWinner, onPick, max }) {
       {isWinner && <div className="duel-crown"><Crown size={14} /> Ganador</div>}
       <div className="duel-pick">
         <SpellIcon spell={R.spell} size={20} />
-        <select value={R.spell.id} onChange={(e) => onPick(e.target.value)} aria-label="Elegir hechizo">
+        <select value={R.spell.id} onChange={(e) => onPick(e.target.value)} aria-label="Elegir conjuro">
           {SPELLS.map((s) => (
             <option key={s.id} value={s.id}>{s.nombre} (Nv {s.nivelMin}{s.nivelMin !== s.nivelMax ? `–${s.nivelMax}` : ''})</option>
           ))}

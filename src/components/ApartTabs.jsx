@@ -1,7 +1,7 @@
 import { Flame, HeartPulse, Compass } from 'lucide-react';
 
 const APARTADOS = [
-  { id: 'dano', label: 'Daño', desc: 'Hechizos, trucos y melé', icon: Flame },
+  { id: 'dano', label: 'Daño', desc: 'Conjuros, trucos y melé', icon: Flame },
   { id: 'cura', label: 'Curación', desc: 'Quién cura más por nivel', icon: HeartPulse },
   { id: 'uti', label: 'Utilidad', desc: 'Trucos de juego sin daño', icon: Compass },
 ];

@@ -27,7 +27,7 @@ export default function SpellGrid({ stats, nivel, spells }) {
   return (
     <section className="panel" id="grimorio">
       <div className="section-title">
-        <h2><BookOpen size={20} /> Grimorio · fichas de hechizo</h2>
+        <h2><BookOpen size={20} /> Grimorio · fichas de conjuro</h2>
         <div className="chips">
           {FILTROS.map((f) => (
             <button key={f.id} className={`chip ${filtro === f.id ? 'on' : ''}`} onClick={() => setFiltro(f.id)}>
@@ -38,7 +38,7 @@ export default function SpellGrid({ stats, nivel, spells }) {
       </div>
       <p className="muted small">El daño mostrado es al <b>nivel {nivel}</b> seleccionado (sincronizado con el ganador y el duelo). Los trucos no gastan espacio: escalan con tu nivel de personaje. El melé usa tu Mod. cuerpo a cuerpo y tus ataques por turno.</p>
       {list.length === 0 && (
-        <div className="card"><p className="muted">Nada disponible con este filtro: tu clase y nivel no llegan a estos hechizos. Cambia de clase, sube de nivel o elige otro modo.</p></div>
+          <div className="card"><p className="muted">Nada disponible con este filtro: tu clase y nivel no llegan a estos conjuros. Cambia de clase, sube de nivel o elige otro modo.</p></div>
       )}
       <div className="spell-grid">
         {list.map((s) => {

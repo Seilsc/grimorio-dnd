@@ -1,7 +1,7 @@
 import { Crown, Swords, Table2, BookOpen, WandSparkles, Sword, LayoutGrid } from 'lucide-react';
 
 const DANO_TABS = [
-  { id: 'mejor', label: 'Mejor hechizo', icon: Crown },
+  { id: 'mejor', label: 'Mejor conjuro', icon: Crown },
   { id: 'duelo', label: 'Duelo 1v1', icon: Swords },
   { id: 'tabla', label: 'Comparativa', icon: Table2 },
   { id: 'grimorio', label: 'Grimorio', icon: BookOpen },
@@ -9,7 +9,7 @@ const DANO_TABS = [
 
 const MODOS = [
   { id: 'todos', label: 'Todos', icon: LayoutGrid },
-  { id: 'hechizos', label: 'Hechizos', icon: WandSparkles },
+  { id: 'hechizos', label: 'Conjuros', icon: WandSparkles },
   { id: 'mele', label: 'Melé', icon: Sword },
 ];
 

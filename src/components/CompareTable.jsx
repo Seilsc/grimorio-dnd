@@ -23,20 +23,20 @@ export default function CompareTable({ stats, spells, vis }) {
 
   return (
     <section className="panel" id="tabla">
-      <h2><Table2 size={20} /> Daño medio de cada hechizo contra este objetivo</h2>
+      <h2><Table2 size={20} /> Daño medio de cada conjuro contra este objetivo</h2>
       <p className="muted small">« – » = no se puede lanzar con ese espacio. La celda de lacre es la mejor de su columna. Los trucos no gastan espacio.</p>
       <div className="table-wrap">
         <table className="compare">
           <thead>
             <tr>
-              <th className="sticky">Hechizo</th>
+              <th className="sticky">Conjuro</th>
               <th>Tirada</th>
               {levels.map((l) => <th key={l}>N{l}</th>)}
             </tr>
           </thead>
           <tbody>
             {shown.length === 0 && (
-              <tr><td colSpan={11} className="muted" style={{ padding: 18 }}>Activa al menos un hechizo arriba para ver la tabla.</td></tr>
+              <tr><td colSpan={11} className="muted" style={{ padding: 18 }}>Activa al menos un conjuro arriba para ver la tabla.</td></tr>
             )}
             {shown.map((s) => (
               <tr key={s.id}>

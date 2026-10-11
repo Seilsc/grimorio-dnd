@@ -149,7 +149,7 @@ export default function WinnerBoard({ nivel, setNivel, stats, ids, ocultos = 0 }
   return (
     <section className="panel" id="ganador">
       <div className="section-title">
-        <h2><Crown size={20} /> Mejor hechizo para este objetivo</h2>
+        <h2><Crown size={20} /> Mejor conjuro para este objetivo</h2>
       </div>
       {ocultos > 0 && (
         <p className="muted small">
@@ -168,7 +168,7 @@ export default function WinnerBoard({ nivel, setNivel, stats, ids, ocultos = 0 }
               key={l}
               className={`podium-cell ${l === nivel ? 'active' : ''}`}
               onClick={() => setNivel(l)}
-              title={b ? `${b.spell.nombre}: ${fmt(b.dmg)}` : `Nivel ${l}: sin hechizos`}
+              title={b ? `${b.spell.nombre}: ${fmt(b.dmg)}` : `Nivel ${l}: sin conjuros`}
             >
               <span className="podium-lvl">N{l}</span>
               {b ? (
@@ -192,7 +192,7 @@ export default function WinnerBoard({ nivel, setNivel, stats, ids, ocultos = 0 }
               <div className="muted">daño medio esperado · {best.dados}</div>
               <div className="muted small">{best.probLabel}</div>
             </>
-          ) : <p className="muted">Sin hechizos a este nivel.</p>}
+          ) : <p className="muted">Sin conjuros a este nivel.</p>}
         </div>
         <div className="card second">
           <div className="second-head"><Medal size={16} /> 2.º mejor · alternativa</div>

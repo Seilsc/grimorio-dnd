@@ -27,7 +27,7 @@ export default function Utilidad({ stats }) {
       <div className="card uti-filters">
         <label className="uti-search">
           <Search size={15} />
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar hechizo…" aria-label="Buscar hechizo" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar conjuro…" aria-label="Buscar conjuro" />
         </label>
         <label>Nivel
           <select value={nv} onChange={(e) => setNv(e.target.value)}>
