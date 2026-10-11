@@ -1,13 +1,19 @@
 import {
   Flame, FlameKindling, Sword, Snowflake, Skull, Atom,
   CloudHail, Ghost, CircleDot, WandSparkles, Zap, Crosshair,
-  Hammer, Axe, Sun,
+  Hammer, Axe, Sun, Waves, Rocket, Shuffle, Music, Bomb, Swords,
+  Orbit, Moon, Droplets, CloudLightning, Footprints, Wind, Mountain,
+  PlugZap, Timer, Sunrise, CloudFog, BrickWall, Cone, Bug, HeartPulse,
+  Hand, Target, FlaskConical, Biohazard, Brain, Volume2, Slice,
 } from 'lucide-react';
 
 const MAP = {
   Flame, FlameKindling, Sword, Snowflake, Skull, Atom,
   CloudHail, Ghost, CircleDot, WandSparkles, Zap, Crosshair,
-  Hammer, Axe, Sun,
+  Hammer, Axe, Sun, Waves, Rocket, Shuffle, Music, Bomb, Swords,
+  Orbit, Moon, Droplets, CloudLightning, Footprints, Wind, Mountain,
+  PlugZap, Timer, Sunrise, CloudFog, BrickWall, Cone, Bug, HeartPulse,
+  Hand, Target, FlaskConical, Biohazard, Brain, Volume2, Slice,
 };
 
 /** Icono Lucide por nombre, teñido con el color dado. */

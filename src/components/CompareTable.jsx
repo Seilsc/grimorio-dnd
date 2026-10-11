@@ -4,11 +4,12 @@ import { SPELLS } from '../data/spells.js';
 import { fullMatrix, bestAndSecond, fmt } from '../lib/damage.js';
 import SpellIcon from './SpellIcon.jsx';
 
-export default function CompareTable({ stats }) {
+export default function CompareTable({ stats, spells }) {
+  const list = spells ?? SPELLS;
   const [visible, setVisible] = useState(() =>
-    Object.fromEntries(SPELLS.map((s) => [s.id, true]))
+    Object.fromEntries(list.map((s) => [s.id, true]))
   );
-  const matrix = fullMatrix(stats);
+  const matrix = fullMatrix(stats, list.map((s) => s.id));
   const levels = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
   // máximo y mejor por nivel (una sola vez por render)
@@ -16,22 +17,22 @@ export default function CompareTable({ stats }) {
   const bestByLvl = {};
   for (const l of levels) {
     let m = 0;
-    for (const s of SPELLS) { const v = matrix[l][s.id].dmg; if (v != null && v > m) m = v; }
+    for (const s of list) { const v = matrix[l][s.id].dmg; if (v != null && v > m) m = v; }
     maxByLvl[l] = m || 1;
-    bestByLvl[l] = bestAndSecond(l, stats).best?.spell.id ?? null;
+    bestByLvl[l] = bestAndSecond(l, stats, list.map((s) => s.id)).best?.spell.id ?? null;
   }
 
-  const shown = SPELLS.filter((s) => visible[s.id]);
+  const shown = list.filter((s) => visible[s.id]);
   const toggle = (id) => setVisible((v) => ({ ...v, [id]: !v[id] }));
-  const showAll = () => setVisible(Object.fromEntries(SPELLS.map((s) => [s.id, true])));
-  const hideAll = () => setVisible(Object.fromEntries(SPELLS.map((s) => [s.id, false])));
+  const showAll = () => setVisible(Object.fromEntries(list.map((s) => [s.id, true])));
+  const hideAll = () => setVisible(Object.fromEntries(list.map((s) => [s.id, false])));
 
   return (
     <section className="panel" id="tabla">
       <h2><Table2 size={20} /> Daño medio de cada hechizo contra este objetivo</h2>
       <p className="muted small">« – » = no se puede lanzar con ese espacio. La celda de lacre es la mejor de su columna.</p>
       <div className="chips chips-row">
-        {SPELLS.map((s) => (
+        {list.map((s) => (
           <button
             key={s.id}
             className={`chip ${visible[s.id] ? 'on' : ''}`}

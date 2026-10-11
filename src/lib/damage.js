@@ -57,7 +57,7 @@ export function dadosStr(spell, nivel) {
  */
 export function spellDamage(spellOrId, nivel, stats) {
   const spell = typeof spellOrId === 'string' ? getSpell(spellOrId) : spellOrId;
-  const { mod, comp, ca, des, con } = stats;
+  const { mod, comp, ca, des, con, sab } = stats;
   const res = (k) => stats.res?.[k] ?? 1;
   const bono = attackBonus(mod, comp);
   const dc = spellDC(mod, comp);
@@ -73,7 +73,11 @@ export function spellDamage(spellOrId, nivel, stats) {
   const pH = pHit(ca, bono);
   const pSdes = pSaveSuccess(dc, des);
   const pScon = pSaveSuccess(dc, con);
-  const fDes = 1 - pSdes, fCon = 1 - pScon;
+  const pSsab = pSaveSuccess(dc, sab ?? 2);
+  const fDes = 1 - pSdes, fCon = 1 - pScon, fSab = 1 - pSsab;
+
+  // Hechizos añadidos (spec genérica): mismo modelo probabilístico que el Excel.
+  if (spell.generic) return genericDamage(spell, nivel, { stats, bono, dc, pH, pSdes, pScon, pSsab, fDes, fCon, fSab });
 
   switch (spell.id) {
     case 'bola-fuego':
@@ -145,25 +149,88 @@ export function spellDamage(spellOrId, nivel, stats) {
   }
 }
 
-export function compareAtLevel(nivel, stats) {
-  return SPELLS.map((s) => {
-    const r = spellDamage(s, nivel, stats);
-    return { spell: s, ...r };
-  })
+/**
+ * Calculadora genérica para los hechizos añadidos: mismo modelo que el Excel
+ * (crítico +5% en ataques, mitad al salvar salvo saveFrac 0), con dados por partes
+ * [{n, c(caras), r(tipo de resistencia)}], escalado por nivel y resistencias.
+ */
+export function genericDamage(spec, nivel, ctx) {
+  const { stats } = ctx;
+  const res = (k) => (!k ? 1 : stats.res?.[k] ?? 1);
+  const subidas = spec.cada
+    ? Math.floor((nivel - spec.nivelBase) / spec.cada)
+    : nivel - spec.nivelBase;
+  // media de dados por tipo de resistencia
+  const dice = {};
+  const add = (parts, mult) => {
+    for (const p of parts || []) {
+      const k = p.r || '_';
+      dice[k] = (dice[k] || 0) + p.n * mult * avgDie(p.c);
+    }
+  };
+  add(spec.base, 1);
+  add(spec.step, subidas);
+  const fijo = (spec.fijo || 0) + (spec.bonoMod ? stats.mod : 0);
+  const keys = Object.keys(dice);
+  const fijoKey = spec.fijoR || keys[0] || '_';
+  const dmgKey = (k) => (dice[k] || 0) + (k === fijoKey ? fijo : 0);
+
+  const saveMap = { des: [ctx.fDes, ctx.pSdes], con: [ctx.fCon, ctx.pScon], sab: [ctx.fSab, ctx.pSsab] };
+  let dmg = 0, prob = null, probLabel = '';
+  if (spec.mech === 'atk') {
+    for (const k of keys) {
+      const dAvg = dice[k] || 0;
+      const fAvg = k === fijoKey ? fijo : 0;
+      dmg += (dAvg * (ctx.pH + 0.05) + fAvg * ctx.pH) * res(k === '_' ? null : k);
+    }
+    prob = ctx.pH;
+    probLabel = `${(ctx.pH * 100).toFixed(0)}% impacto (+5% crít.)`;
+  } else if (spec.mech === 'auto') {
+    for (const k of keys) dmg += dmgKey(k) * res(k === '_' ? null : k);
+    prob = 1;
+    probLabel = spec.mechNote || '100% (sin tirada)';
+  } else {
+    const [pFail, pSave] = saveMap[spec.mech] || saveMap.des;
+    const frac = spec.saveFrac ?? 0.5;
+    for (const k of keys) dmg += dmgKey(k) * (pFail + pSave * frac) * res(k === '_' ? null : k);
+    prob = pFail;
+    const sabLabel = spec.mech === 'sab' ? 'SAB' : spec.mech === 'con' ? 'CON' : 'DES';
+    probLabel = `${(pFail * 100).toFixed(0)}% fallo ${sabLabel}${frac === 0 ? ' (0 si salva)' : ''}`;
+  }
+  return { dmg, lanzable: true, prob, probLabel, dados: dadosGeneric(spec) };
+}
+
+export function dadosGeneric(spec) {
+  const fmtParts = (parts) => (parts || []).map((p) => `${p.n}d${p.c}`).join(' + ');
+  let s = fmtParts(spec.base);
+  if (spec.fijo) s += `+${spec.fijo}`;
+  if (spec.bonoMod) s += '+mod';
+  if (spec.step?.length) s += ` (+${fmtParts(spec.step)}${spec.cada ? ` cada ${spec.cada} niveles` : '/nivel'})`;
+  return s;
+}
+
+export function compareAtLevel(nivel, stats, ids = null) {
+  return SPELLS
+    .filter((s) => !ids || ids.includes(s.id))
+    .map((s) => {
+      const r = spellDamage(s, nivel, stats);
+      return { spell: s, ...r };
+    })
     .filter((r) => r.lanzable)
     .sort((a, b) => b.dmg - a.dmg);
 }
 
-export function bestAndSecond(nivel, stats) {
-  const arr = compareAtLevel(nivel, stats);
+export function bestAndSecond(nivel, stats, ids = null) {
+  const arr = compareAtLevel(nivel, stats, ids);
   return { best: arr[0] ?? null, second: arr[1] ?? null };
 }
 
-export function fullMatrix(stats) {
+export function fullMatrix(stats, ids = null) {
   const out = {};
+  const list = SPELLS.filter((s) => !ids || ids.includes(s.id));
   for (let lvl = 1; lvl <= 9; lvl++) {
     out[lvl] = {};
-    for (const s of SPELLS) out[lvl][s.id] = spellDamage(s, lvl, stats);
+    for (const s of list) out[lvl][s.id] = spellDamage(s, lvl, stats);
   }
   return out;
 }
@@ -195,12 +262,18 @@ export const fmt = (v) => (v == null ? '–' : (Math.round(v * 10) / 10).toFixed
  */
 export function zeroRisk(spellOrId, nivel, stats) {
   const spell = typeof spellOrId === 'string' ? getSpell(spellOrId) : spellOrId;
-  const { mod, comp, ca, des } = stats;
+  const { mod, comp, ca, des, sab } = stats;
   if (nivel < spell.nivelMin || nivel > spell.nivelMax) return null;
   const bono = attackBonus(mod, comp);
   const dc = spellDC(mod, comp);
   const pH = pHit(ca, bono);
   const pSdes = pSaveSuccess(dc, des);
+  if (spell.generic) {
+    if (spell.mech === 'auto') return 0;
+    if (spell.mech === 'atk') return 1 - pH;
+    const ps = spell.mech === 'con' ? pSaveSuccess(dc, stats.con) : spell.mech === 'sab' ? pSaveSuccess(dc, sab ?? 2) : pSdes;
+    return (spell.saveFrac ?? 0.5) === 0 ? ps : 0;
+  }
   switch (spell.id) {
     case 'proyectil-magico':
       return 0;
@@ -234,13 +307,13 @@ export function zeroRisk(spellOrId, nivel, stats) {
  * (ca 1–39, des/con −5–19) y comprime los tramos donde gana cada hechizo.
  * Devuelve [{ id, from, to }].
  */
-export function ruptureScan(varKey, nivel, stats) {
+export function ruptureScan(varKey, nivel, stats, ids = null) {
   const min = varKey === 'ca' ? 1 : -5;
   const max = varKey === 'ca' ? 39 : 19;
   const out = [];
   let cur = null;
   for (let v = min; v <= max; v++) {
-    const b = bestAndSecond(nivel, { ...stats, [varKey]: v }).best;
+    const b = bestAndSecond(nivel, { ...stats, [varKey]: v }, ids).best;
     const id = b ? b.spell.id : null;
     if (!cur || cur.id !== id) { cur = { id, from: v, to: v }; out.push(cur); }
     else cur.to = v;

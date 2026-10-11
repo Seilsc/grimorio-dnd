@@ -68,9 +68,9 @@ function explainBullets(best, second, stats) {
   return out;
 }
 
-function RuptureCard({ nivel, stats, defaultVar }) {
+function RuptureCard({ nivel, stats, defaultVar, ids }) {
   const [rvar, setRvar] = useState(defaultVar);
-  const ranges = ruptureScan(rvar, nivel, stats);
+  const ranges = ruptureScan(rvar, nivel, stats, ids);
   const rmin = rvar === 'ca' ? 1 : -5;
   const rmax = rvar === 'ca' ? 39 : 19;
   const curVal = stats[rvar];
@@ -122,12 +122,13 @@ function RuptureCard({ nivel, stats, defaultVar }) {
   );
 }
 
-export default function WinnerBoard({ nivel, setNivel, stats }) {
+export default function WinnerBoard({ nivel, setNivel, stats, ids }) {
   const levels = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-  const { best, second } = bestAndSecond(nivel, stats);
-  const top5 = compareAtLevel(nivel, stats).slice(0, 5);
+  const { best, second } = bestAndSecond(nivel, stats, ids);
+  const top5 = compareAtLevel(nivel, stats, ids).slice(0, 5);
   const maxTop = top5[0]?.dmg || 1;
   const [copied, setCopied] = useState(false);
+  const [copyText, setCopyText] = useState(null);
 
   const defaultVar = !best ? 'ca'
     : best.spell.tirada === 'ataque' ? 'ca'
@@ -138,28 +139,38 @@ export default function WinnerBoard({ nivel, setNivel, stats }) {
     if (!best) return;
     const sign = (v) => (v > 0 ? `+${v}` : `${v}`);
     const lines = [
-      `Nivel ${nivel} vs CA ${stats.ca}, DES ${sign(stats.des)}, CON ${sign(stats.con)}:${resSummary(stats)}`,
+      `Nivel ${nivel} vs CA ${stats.ca}, DES ${sign(stats.des)}, CON ${sign(stats.con)}, SAB ${sign(stats.sab ?? 2)}:${resSummary(stats)}`,
       `1.º ${best.spell.nombre} ${fmt(best.dmg)} (${best.dados}, ${best.probLabel}).`,
     ];
     if (second) lines.push(`2.º ${second.spell.nombre} ${fmt(second.dmg)} (${second.dados}).`);
-    const firstOther = ranges.find((r) => r.id !== best.spell.id);
-    if (firstOther) {
-      const w = getSpell(firstOther.id);
-      lines.push(`Ojo: con ${rvar.toUpperCase()} ${firstOther.from}${firstOther.from !== firstOther.to ? `–${firstOther.to}` : ''} ganaría ${w ? w.nombre : 'otro'}.`);
-    }
     const text = lines.join(' ');
+    let ok = false;
     try {
-      await navigator.clipboard.writeText(text);
-    } catch {
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        ok = true;
+      }
+    } catch { /* cae al método manual */ }
+    if (!ok) {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+      } catch { ok = false; }
     }
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1800);
+    if (ok) {
+      setCopyText(null);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } else {
+      setCopyText(text); // el navegador lo bloquea: muestro el texto para copiar a mano
+    }
   };
 
   return (
@@ -171,10 +182,18 @@ export default function WinnerBoard({ nivel, setNivel, stats }) {
         </button>
       </div>
 
+      {copyText && (
+        <div className="card copy-box">
+          <p className="muted small">Tu navegador bloquea el copiado automático. Selecciona y copia el texto a mano:</p>
+          <textarea readOnly value={copyText} rows={3} onFocus={(e) => e.target.select()} />
+          <div><button className="swap" onClick={() => setCopyText(null)}>Cerrar</button></div>
+        </div>
+      )}
+
       {/* Podio completo 1-9 */}
       <div className="podium">
         {levels.map((l) => {
-          const b = bestAndSecond(l, stats).best;
+          const b = bestAndSecond(l, stats, ids).best;
           return (
             <button
               key={l}
@@ -256,7 +275,7 @@ export default function WinnerBoard({ nivel, setNivel, stats }) {
       )}
 
       {/* Punto de ruptura (key=nivel: al cambiar de nivel se reinicia la variable) */}
-      <RuptureCard key={nivel} nivel={nivel} stats={stats} defaultVar={defaultVar} />
+      <RuptureCard key={nivel} nivel={nivel} stats={stats} defaultVar={defaultVar} ids={ids} />
     </section>
   );
 }

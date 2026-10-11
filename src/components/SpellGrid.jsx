@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
-import { SPELLS } from '../data/spells.js';
+import { SPELLS, claseLabel } from '../data/spells.js';
 import { spellDamage, fmt } from '../lib/damage.js';
 import SpellIcon from './SpellIcon.jsx';
 
@@ -13,11 +13,12 @@ const FILTROS = [
   { id: 'mixto', label: 'Mixto' },
 ];
 
-export default function SpellGrid({ stats, nivel }) {
+export default function SpellGrid({ stats, nivel, spells }) {
+  const base = spells ?? SPELLS;
   const [filtro, setFiltro] = useState('todos');
   const [abierto, setAbierto] = useState(null);
 
-  const list = SPELLS.filter((s) => filtro === 'todos' || s.tirada === filtro);
+  const list = base.filter((s) => filtro === 'todos' || s.tirada === filtro);
   const detail = (s) => spellDamage(s, nivel, stats);
 
   return (
@@ -32,7 +33,7 @@ export default function SpellGrid({ stats, nivel }) {
           ))}
         </div>
       </div>
-      <p className="muted small">El daño mostrado es al <b>nivel {nivel}</b> seleccionado (sincronizado con el ganador y el duelo).</p>
+      <p className="muted small">El daño mostrado es al <b>nivel {nivel}</b> seleccionado (sincronizado con el ganador y el duelo). Sin trucos: escalan con nivel de personaje, no con espacio.</p>
       <div className="spell-grid">
         {list.map((s) => {
           const r = detail(s);
@@ -47,7 +48,11 @@ export default function SpellGrid({ stats, nivel }) {
                     <span className="badge">{s.tiradaLabel}</span>
                     <span className="badge dmg" style={{ '--c': s.color }}>{s.tipoDano}</span>
                     <span className="badge lvl">Nv {s.nivelMin}{s.nivelMin !== s.nivelMax ? `–${s.nivelMax}` : ''}</span>
+                    {s.libro && <span className="badge book">{s.libro}</span>}
                   </div>
+                  {s.clases?.length > 0 && (
+                    <div className="muted small classes-line">{s.clases.map(claseLabel).join(' · ')}</div>
+                  )}
                 </div>
               </div>
               <div className="spell-dmg-row">

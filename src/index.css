@@ -170,6 +170,22 @@ code {
 }
 .inputs-group h2 { display: flex; gap: 8px; align-items: center; font-size: 17px; margin: 0 0 2px; color: var(--ink); text-shadow: none; }
 
+/* Selector de clase */
+.class-label { display: grid; gap: 5px; font-size: 14px; font-weight: 700; color: var(--ink); margin: 8px 0 4px; }
+
+/* Caja de copiado manual */
+.copy-box { margin: 0 4px 12px; }
+.copy-box textarea {
+  width: 100%; font-family: 'Alegreya', serif; font-size: 14px;
+  background: var(--leather); color: var(--parch);
+  border: 1px solid var(--bronze-dark); border-radius: 6px; padding: 8px;
+}
+.copy-box .swap { margin-top: 8px; }
+
+/* Insignia de libro y línea de clases */
+.badge.book { border-color: var(--gold); color: var(--gold-soft); }
+.classes-line { margin-top: 5px; font-style: italic; }
+
 /* STEPPER de bronce */
 .stepper { margin: 12px 0; }
 .stepper-label { font-size: 14px; color: var(--ink); font-weight: 700; }
@@ -209,6 +225,9 @@ input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 .derived b { color: var(--gold-soft); font-size: 17px; }
 
 /* RESISTENCIAS */
+.res-head { display: flex; align-items: center; gap: 4px; margin: 10px 0 2px; }
+.res-head > span:first-child { flex: 1; }
+.res-head > span:not(:first-child) { width: 46px; text-align: center; font-size: 11px; font-weight: 700; color: var(--muted); font-family: 'Cinzel', serif; }
 .res-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 7px 0; }
 .res-name { display: inline-flex; align-items: center; gap: 7px; font-size: 14.5px; font-weight: 700; color: var(--ink); }
 .res-seg { display: flex; gap: 4px; }
@@ -216,7 +235,7 @@ input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
   font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700;
   background: #00000022; color: var(--muted);
   border: 1px solid var(--bronze-dark); border-radius: 5px;
-  padding: 4px 8px; cursor: pointer;
+  padding: 4px 0; width: 46px; cursor: pointer;
 }
 .res-btn:hover { color: var(--ink); border-color: var(--bronze); }
 .res-btn.on { background: linear-gradient(180deg, var(--leather2), var(--leather)); color: var(--gold-soft); border-color: var(--gold); }
