@@ -167,24 +167,33 @@ export const TIRADA_COLORS = {
 export const CLASES = [
   { key: 'todas', label: 'Todas las clases' },
   { key: 'artifice', label: 'Artífice' },
+  { key: 'barbaro', label: 'Bárbaro' },
   { key: 'bardo', label: 'Bardo' },
+  { key: 'caballero', label: 'Caballero arcano' },
   { key: 'clerigo', label: 'Clérigo' },
   { key: 'druida', label: 'Druida' },
-  { key: 'paladin', label: 'Paladín' },
   { key: 'explorador', label: 'Explorador' },
+  { key: 'guerrero', label: 'Guerrero' },
   { key: 'hechicero', label: 'Hechicero' },
   { key: 'brujo', label: 'Brujo' },
   { key: 'mago', label: 'Mago' },
-  { key: 'caballero', label: 'Caballero arcano' },
-  { key: 'picaro', label: 'Pícaro arcano' },
+  { key: 'monje', label: 'Monje' },
+  { key: 'paladin', label: 'Paladín' },
+  { key: 'picaro', label: 'Pícaro' },
+  { key: 'picaro-arcano', label: 'Pícaro arcano' },
 ];
 
 export const claseLabel = (key) => CLASES.find((c) => c.key === key)?.label ?? key;
 
-export function spellsFor(clase) {
-  if (!clase || clase === 'todas') return SPELLS;
-  if (clase === 'caballero' || clase === 'picaro') return SPELLS.filter((s) => s.clases.includes('mago'));
-  return SPELLS.filter((s) => s.clases.includes(clase));
+// modo: 'hechizos' (conjuros + trucos), 'mele' (armas y rasgos), 'todos'.
+export function spellsFor(clase, modo = 'todos') {
+  let base;
+  if (!clase || clase === 'todas') base = SPELLS;
+  else if (clase === 'caballero' || clase === 'picaro-arcano') base = SPELLS.filter((s) => s.clases.includes('mago'));
+  else base = SPELLS.filter((s) => s.clases.includes(clase));
+  if (modo === 'mele') return base.filter((s) => s.cat === 'mele');
+  if (modo === 'hechizos') return base.filter((s) => s.cat !== 'mele');
+  return base;
 }
 
 // Clases y libro de los 12 hechizos originales del Excel.
@@ -260,3 +269,65 @@ export const SPELLS_EXTRA = [
 ];
 
 SPELLS.push(...SPELLS_EXTRA);
+
+// Trucos que hacen daño (PHB + XGtE + TCoE). No gastan espacio: su daño escala
+// con el NIVEL DE PERSONAJE (1 dado, 2 a nv.5, 3 a nv.11, 4 a nv.17) y usan tu
+// característica de lanzamiento. Se muestran planos en N1–N9.
+// Excluidos: filo explosivo/fuego verde (dependen del arma), piedra mágica (arma),
+// atracción... no: solo quedan fuera los de FUE/INT, que sí entran (ver abajo).
+export const CANTRIPS = [
+  { id: 't-descarga-fuego', nombre: 'Descarga de fuego', icon: 'Flame', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, truco: true, mech: 'atk', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'fuego', color: '#f97316', caras: 10, clases: ['hechicero', 'mago'], libro: 'PHB', notas: 'Truco: escala con tu nivel (2 dados a nv. 5).' },
+  { id: 't-explosion-sobrenatural', nombre: 'Explosión sobrenatural', icon: 'Zap', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, truco: true, mech: 'atk', haces: true, tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'fuerza', color: '#60a5fa', caras: 10, clases: ['brujo'], libro: 'PHB', notas: 'Un rayo por haz (2 haces a nv. 5); cada uno tira ataque.' },
+  { id: 't-rayo-escarcha', nombre: 'Rayo de escarcha', icon: 'Snowflake', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, truco: true, mech: 'atk', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'frío', color: '#38bdf8', caras: 8, clases: ['artifice', 'hechicero', 'mago'], libro: 'PHB', notas: 'Ralentiza 3 m hasta tu próximo turno.' },
+  { id: 't-toque-helado', nombre: 'Toque helado', icon: 'Ghost', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, truco: true, mech: 'atk', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'necrótico', color: '#a855f7', caras: 8, clases: ['hechicero', 'brujo', 'mago'], libro: 'PHB', notas: 'Impide recuperar puntos de golpe un asalto.' },
+  { id: 't-agarre-electrico', nombre: 'Agarre eléctrico', icon: 'PlugZap', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, truco: true, mech: 'atk', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'relámpago', color: '#7dd3fc', caras: 8, clases: ['artifice', 'hechicero', 'mago'], libro: 'PHB', notas: 'Ventaja contra metal; le quita la reacción.' },
+  { id: 't-rociada-veneno', nombre: 'Rociada de veneno', icon: 'FlaskConical', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, truco: true, mech: 'con', tirada: 'salv-con', tiradaLabel: 'Salvación CON', tipoDano: 'veneno', color: '#65a30d', caras: 12, clases: ['artifice', 'druida', 'hechicero', 'brujo', 'mago'], libro: 'PHB', notas: 'Cono de 3 m. Mitad... no: si supera no hay daño.' , saveFrac: 0 },
+  { id: 't-salpicadura-acida', nombre: 'Salpicadura ácida', icon: 'Droplets', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, truco: true, mech: 'des', tirada: 'salv-des', tiradaLabel: 'Salvación DES', tipoDano: 'ácido', color: '#4ade80', caras: 6, clases: ['artifice', 'hechicero', 'mago'], libro: 'PHB', notas: 'Puedes salpicar a dos criaturas juntas.' , saveFrac: 0 },
+  { id: 't-llama-sagrada', nombre: 'Llama sagrada', icon: 'Sun', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, truco: true, mech: 'des', tirada: 'salv-des', tiradaLabel: 'Salvación DES', tipoDano: 'radiante', color: '#facc15', caras: 8, clases: ['clerigo'], libro: 'PHB', notas: 'Ignora cobertura. Si supera no hay daño.', saveFrac: 0 },
+  { id: 't-toque-muerte', nombre: 'Toque de muerte', icon: 'Skull', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, truco: true, mech: 'sab', tirada: 'salv-sab', tiradaLabel: 'Salvación SAB', tipoDano: 'necrótico', color: '#a855f7', caras: 8, clases: ['clerigo', 'brujo', 'mago'], libro: 'XGtE', notas: 'Contado 1d8; si está herido sería 1d12.' , saveFrac: 0 },
+  { id: 't-palabra-resplandor', nombre: 'Palabra de resplandor', icon: 'Sunrise', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, truco: true, mech: 'con', tirada: 'salv-con', tiradaLabel: 'Salvación CON', tipoDano: 'radiante', color: '#facc15', caras: 6, clases: ['clerigo'], libro: 'XGtE', notas: 'Alcanza a todos a tu alrededor.', saveFrac: 0 },
+  { id: 't-burla-cruel', nombre: 'Burla cruel', icon: 'Music', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, truco: true, mech: 'sab', tirada: 'salv-sab', tiradaLabel: 'Salvación SAB', tipoDano: 'psíquico', color: '#c084fc', caras: 4, clases: ['bardo'], libro: 'PHB', notas: 'Además desventaja en su próximo ataque.', saveFrac: 0 },
+  { id: 't-latigo-espinas', nombre: 'Látigo de espinas', icon: 'Slice', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, truco: true, mech: 'atk', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'perforante', color: '#d1a054', caras: 6, clases: ['artifice', 'druida'], libro: 'PHB', notas: 'Arrastra 3 m si impacta.' },
+  { id: 't-producir-llama', nombre: 'Producir llama', icon: 'FlameKindling', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, truco: true, mech: 'atk', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'fuego', color: '#f97316', caras: 8, clases: ['druida'], libro: 'PHB', notas: 'También da luz 10 minutos.' },
+  { id: 't-hoguera', nombre: 'Hoguera', icon: 'Cone', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, truco: true, mech: 'des', tirada: 'salv-des', tiradaLabel: 'Salvación DES', tipoDano: 'fuego', color: '#f97316', caras: 8, clases: ['artifice', 'druida', 'hechicero', 'brujo', 'mago'], libro: 'XGtE', notas: 'Zona que quema al entrar. Si supera no hay daño.', saveFrac: 0 },
+  { id: 't-mordisco-escarcha', nombre: 'Mordisco de escarcha', icon: 'Snowflake', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, truco: true, mech: 'con', tirada: 'salv-con', tiradaLabel: 'Salvación CON', tipoDano: 'frío', color: '#38bdf8', caras: 6, clases: ['artifice', 'druida', 'hechicero', 'brujo', 'mago'], libro: 'XGtE', notas: 'Además desventaja en su próximo ataque de arma.', saveFrac: 0 },
+  { id: 't-trueno', nombre: 'Atronar', icon: 'Volume2', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, truco: true, mech: 'con', tirada: 'salv-con', tiradaLabel: 'Salvación CON', tipoDano: 'trueno', color: '#eab308', caras: 6, clases: ['bardo', 'druida', 'hechicero', 'brujo', 'mago'], libro: 'XGtE', notas: 'Estruendo audible a 30 m.', saveFrac: 0 },
+  { id: 't-explosion-espadas', nombre: 'Explosión de espadas', icon: 'Swords', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, truco: true, mech: 'des', tirada: 'salv-des', tiradaLabel: 'Salvación DES', tipoDano: 'fuerza', color: '#60a5fa', caras: 6, clases: ['artifice', 'hechicero', 'brujo', 'mago'], libro: 'XGtE', notas: 'Alcanza a todos a 1,5 m.', saveFrac: 0 },
+  { id: 't-atraccion-relampago', nombre: 'Atracción de relámpago', icon: 'Zap', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, truco: true, mech: 'fue', tirada: 'salv-fue', tiradaLabel: 'Salvación FUE', tipoDano: 'relámpago', color: '#7dd3fc', caras: 8, clases: ['artifice', 'druida', 'hechicero', 'brujo', 'mago'], libro: 'XGtE', notas: 'Arrastra 3 m si falla. Si supera no hay daño.', saveFrac: 0 },
+  { id: 't-aguijon-mental', nombre: 'Aguijón mental', icon: 'Brain', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, truco: true, mech: 'int', tirada: 'salv-int', tiradaLabel: 'Salvación INT', tipoDano: 'psíquico', color: '#c084fc', caras: 6, clases: ['hechicero', 'brujo', 'mago'], libro: 'TCoE', notas: 'Le resta 1d4 a su próxima salvación.', saveFrac: 0 },
+  { id: 't-salvajismo-primigenio', nombre: 'Salvajismo primigenio', icon: 'Ghost', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, truco: true, mech: 'atk', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'ácido', color: '#4ade80', caras: 10, clases: ['druida'], libro: 'XGtE', notas: 'Tus garras o colmillos.' },
+  { id: 't-infestacion', nombre: 'Infestación', icon: 'Bug', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, truco: true, mech: 'con', tirada: 'salv-con', tiradaLabel: 'Salvación CON', tipoDano: 'veneno', color: '#65a30d', caras: 6, clases: ['druida', 'hechicero', 'mago'], libro: 'TCoE', notas: 'Le mueve 1,5 m en dirección aleatoria.', saveFrac: 0 },
+];
+
+SPELLS.push(...CANTRIPS);
+
+// Melé: armas y rasgos de clase (PHB + XGtE). Usan tu Mod. cuerpo a cuerpo y tu
+// nº de ataques por turno (automático por clase y nivel). El crítico dobla dados.
+const SENCILLAS = ['barbaro', 'guerrero', 'paladin', 'explorador', 'monje', 'picaro', 'bardo', 'caballero'];
+const MARCIALES = ['barbaro', 'guerrero', 'paladin', 'explorador', 'caballero'];
+export const MELEE = [
+  { id: 'm-daga', nombre: 'Daga', icon: 'Slice', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, cat: 'mele', mech: 'atk', atkStat: 'mel', danoMod: 'mel', golpes: 'turno', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'perforante', color: '#d1a054', base: [{ n: 1, c: 4, r: 'perforante' }], step: [], clases: SENCILLAS, libro: 'PHB', notas: 'Sencilla, arrojadiza. Un ataque por cada ataque de tu turno.' },
+  { id: 'm-espada-corta', nombre: 'Espada corta', icon: 'Sword', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, cat: 'mele', mech: 'atk', atkStat: 'mel', danoMod: 'mel', golpes: 'turno', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'perforante', color: '#d1a054', base: [{ n: 1, c: 6, r: 'perforante' }], step: [], clases: SENCILLAS, libro: 'PHB', notas: 'Sencilla, sutil.' },
+  { id: 'm-cimitarra', nombre: 'Cimitarra', icon: 'Swords', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, cat: 'mele', mech: 'atk', atkStat: 'mel', danoMod: 'mel', golpes: 'turno', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'cortante', color: '#d1a054', base: [{ n: 1, c: 6, r: 'cortante' }], step: [], clases: SENCILLAS, libro: 'PHB', notas: 'Sencilla, sutil.' },
+  { id: 'm-maza', nombre: 'Maza', icon: 'Hammer', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, cat: 'mele', mech: 'atk', atkStat: 'mel', danoMod: 'mel', golpes: 'turno', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'contundente', color: '#b08968', base: [{ n: 1, c: 6, r: 'contundente' }], step: [], clases: SENCILLAS, libro: 'PHB', notas: 'Sencilla.' },
+  { id: 'm-lanza', nombre: 'Lanza', icon: 'Navigation', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, cat: 'mele', mech: 'atk', atkStat: 'mel', danoMod: 'mel', golpes: 'turno', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'perforante', color: '#d1a054', base: [{ n: 1, c: 6, r: 'perforante' }], step: [], clases: SENCILLAS, libro: 'PHB', notas: 'Sencilla, arrojadiza.' },
+  { id: 'm-punetazo', nombre: 'Puñetazo', icon: 'Hand', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, cat: 'mele', mech: 'atk', atkStat: 'mel', danoMod: 'mel', golpes: 'turno', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'contundente', color: '#b08968', base: [], fijo: 1, fijoR: 'contundente', step: [], clases: ['barbaro', 'guerrero', 'paladin', 'explorador', 'monje', 'picaro', 'bardo', 'caballero', 'picaro-arcano'], libro: 'PHB', notas: '1 + mod por golpe.' },
+  { id: 'm-estoque', nombre: 'Estoque', icon: 'Sword', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, cat: 'mele', mech: 'atk', atkStat: 'mel', danoMod: 'mel', golpes: 'turno', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'perforante', color: '#d1a054', base: [{ n: 1, c: 8, r: 'perforante' }], step: [], clases: [...MARCIALES, 'picaro', 'bardo', 'picaro-arcano'], libro: 'PHB', notas: 'Marcial, sutil.' },
+  { id: 'm-espada-larga', nombre: 'Espada larga', icon: 'Sword', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, cat: 'mele', mech: 'atk', atkStat: 'mel', danoMod: 'mel', golpes: 'turno', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'cortante', color: '#d1a054', base: [{ n: 1, c: 8, r: 'cortante' }], step: [], clases: [...MARCIALES, 'bardo', 'picaro-arcano'], libro: 'PHB', notas: 'Marcial (1d10 a dos manos, no contado).' },
+  { id: 'm-hacha-batalla', nombre: 'Hacha de batalla', icon: 'Axe', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, cat: 'mele', mech: 'atk', atkStat: 'mel', danoMod: 'mel', golpes: 'turno', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'cortante', color: '#d1a054', base: [{ n: 1, c: 8, r: 'cortante' }], step: [], clases: MARCIALES, libro: 'PHB', notas: 'Marcial.' },
+  { id: 'm-martillo-guerra', nombre: 'Martillo de guerra', icon: 'Hammer', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, cat: 'mele', mech: 'atk', atkStat: 'mel', danoMod: 'mel', golpes: 'turno', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'contundente', color: '#b08968', base: [{ n: 1, c: 8, r: 'contundente' }], step: [], clases: MARCIALES, libro: 'PHB', notas: 'Marcial.' },
+  { id: 'm-mandoble', nombre: 'Mandoble', icon: 'Swords', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, cat: 'mele', mech: 'atk', atkStat: 'mel', danoMod: 'mel', golpes: 'turno', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'cortante', color: '#d1a054', base: [{ n: 2, c: 6, r: 'cortante' }], step: [], clases: MARCIALES, libro: 'PHB', notas: 'Marcial, a dos manos.' },
+  { id: 'm-hacha-dos-manos', nombre: 'Hacha a dos manos', icon: 'Axe', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, cat: 'mele', mech: 'atk', atkStat: 'mel', danoMod: 'mel', golpes: 'turno', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'cortante', color: '#d1a054', base: [{ n: 1, c: 12, r: 'cortante' }], step: [], clases: MARCIALES, libro: 'PHB', notas: 'Marcial, pesada.' },
+  { id: 'm-alabarda', nombre: 'Alabarda', icon: 'Navigation', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, cat: 'mele', mech: 'atk', atkStat: 'mel', danoMod: 'mel', golpes: 'turno', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'cortante', color: '#d1a054', base: [{ n: 1, c: 10, r: 'cortante' }], step: [], clases: MARCIALES, libro: 'PHB', notas: 'Marcial, alcance.' },
+  // ——— Rasgos de clase ———
+  { id: 'm-artes-marciales', nombre: 'Artes marciales (turno)', icon: 'Hand', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, cat: 'mele', mech: 'atk', atkStat: 'mel', danoMod: 'mel', golpes: 'turno', golpeExtra: 1, tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'contundente', color: '#b08968', dadosPJ: (lvl) => [{ n: 1, c: lvl >= 17 ? 10 : lvl >= 11 ? 8 : lvl >= 5 ? 6 : 4, r: 'contundente' }], step: [], clases: ['monje'], libro: 'PHB', notas: 'Turno completo: tus ataques + 1 desarmado. Ráfaga = un desarmado más.' },
+  { id: 'm-castigo-divino', nombre: 'Castigo divino', icon: 'Sun', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, cat: 'mele', mech: 'atk', atkStat: 'mel', golpes: 'uno', tope: 5, tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'radiante', color: '#facc15', base: [{ n: 2, c: 8, r: 'radiante' }], step: [{ n: 1, c: 8, r: 'radiante' }], clases: ['paladin'], libro: 'PHB', notas: 'Gasta un espacio (máx. 5.º); +1d8 contra muertos vivientes o infernales, no contado. Sin contar el arma.' },
+  { id: 'm-ataque-furtivo', nombre: 'Ataque furtivo', icon: 'Eye', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, cat: 'mele', mech: 'atk', atkStat: 'mel', golpes: 'uno', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'perforante', color: '#d1a054', dadosPJ: (lvl) => [{ n: Math.max(1, Math.ceil(lvl / 2)), c: 6, r: 'perforante' }], step: [], clases: ['picaro', 'picaro-arcano'], libro: 'PHB', notas: 'Una vez por turno con ventaja o aliado cerca. Sin contar el arma.' },
+  { id: 'm-golpe-divino', nombre: 'Golpe divino', icon: 'Shield', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, cat: 'mele', mech: 'atk', atkStat: 'mel', golpes: 'uno', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'radiante', color: '#facc15', dadosPJ: (lvl) => [{ n: lvl >= 14 ? 2 : 1, c: 8, r: 'radiante' }], step: [], clases: ['clerigo'], libro: 'PHB', notas: 'Una vez por turno al impactar con arma. Sin contar el arma.' },
+  { id: 'm-marca-cazador', nombre: 'Marca del cazador', icon: 'Target', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, cat: 'mele', mech: 'atk', atkStat: 'mel', golpes: 'turno', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'del arma', color: '#b08968', base: [{ n: 1, c: 6 }], step: [], clases: ['explorador'], libro: 'PHB', notas: '+1d6 por cada golpe que impacte. Concentración.' },
+  { id: 'm-maleficio', nombre: 'Maleficio', icon: 'Moon', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, cat: 'mele', mech: 'atk', atkStat: 'mod', golpes: 'haces', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'necrótico', color: '#a855f7', base: [{ n: 1, c: 6, r: 'necrotico' }], step: [], clases: ['brujo'], libro: 'PHB', notas: 'Supone tus ataques de Explosión sobrenatural (1d6 por haz que impacte). Concentración.' },
+  { id: 'm-castigo-sobrenatural', nombre: 'Castigo sobrenatural', icon: 'Ghost', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, cat: 'mele', mech: 'atk', atkStat: 'mel', golpes: 'uno', tope: 5, tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'fuerza', color: '#60a5fa', base: [{ n: 1, c: 8, r: 'fuerza' }], step: [{ n: 1, c: 8, r: 'fuerza' }], clases: ['brujo'], libro: 'XGtE', notas: 'Con arma de pacto; derriba si es Enorme o menor. Sin contar el arma.' },
+  { id: 'm-floreo', nombre: 'Floreo de duelo', icon: 'Music', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, cat: 'mele', mech: 'atk', atkStat: 'mel', golpes: 'uno', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'del arma', color: '#b08968', dadosPJ: (lvl) => [{ n: 1, c: lvl >= 15 ? 12 : lvl >= 10 ? 10 : lvl >= 5 ? 8 : 6 }], step: [], clases: ['bardo'], libro: 'XGtE', notas: 'Gasta un dado de Inspiración al impactar. Sin contar el arma.' },
+];
+
+SPELLS.push(...MELEE);

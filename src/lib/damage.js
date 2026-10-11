@@ -57,7 +57,7 @@ export function dadosStr(spell, nivel) {
  */
 export function spellDamage(spellOrId, nivel, stats) {
   const spell = typeof spellOrId === 'string' ? getSpell(spellOrId) : spellOrId;
-  const { mod, comp, ca, des, con, sab } = stats;
+  const { mod, comp, ca, des, con, sab, fue, int } = stats;
   const res = (k) => stats.res?.[k] ?? 1;
   const bono = attackBonus(mod, comp);
   const dc = spellDC(mod, comp);
@@ -74,10 +74,12 @@ export function spellDamage(spellOrId, nivel, stats) {
   const pSdes = pSaveSuccess(dc, des);
   const pScon = pSaveSuccess(dc, con);
   const pSsab = pSaveSuccess(dc, sab ?? 2);
-  const fDes = 1 - pSdes, fCon = 1 - pScon, fSab = 1 - pSsab;
+  const pSfue = pSaveSuccess(dc, fue ?? 2);
+  const pSint = pSaveSuccess(dc, int ?? 0);
+  const fDes = 1 - pSdes, fCon = 1 - pScon, fSab = 1 - pSsab, fFue = 1 - pSfue, fInt = 1 - pSint;
 
   // Hechizos añadidos (spec genérica): mismo modelo probabilístico que el Excel.
-  if (spell.generic) return genericDamage(spell, nivel, { stats, bono, dc, pH, pSdes, pScon, pSsab, fDes, fCon, fSab });
+  if (spell.generic) return genericDamage(spell, nivel, { stats, bono, dc, pH, pSdes, pScon, pSsab, pSfue, pSint, fDes, fCon, fSab, fFue, fInt });
 
   switch (spell.id) {
     case 'bola-fuego':
@@ -149,17 +151,60 @@ export function spellDamage(spellOrId, nivel, stats) {
   }
 }
 
+// Ataques por turno según clase y nivel de personaje (Ataque adicional).
+export function ataquesTurno(clase, nivelPJ) {
+  const n = nivelPJ ?? 5;
+  if (clase === 'guerrero' || clase === 'caballero') return n >= 20 ? 4 : n >= 11 ? 3 : n >= 5 ? 2 : 1;
+  if (['barbaro', 'paladin', 'explorador', 'monje'].includes(clase)) return n >= 5 ? 2 : 1;
+  return 1;
+}
+
+// Haces de truco / Explosión sobrenatural según nivel de personaje.
+export function hacesTruco(nivelPJ) {
+  const n = nivelPJ ?? 5;
+  return n >= 17 ? 4 : n >= 11 ? 3 : n >= 5 ? 2 : 1;
+}
+
+// Nº de impactos de una spec genérica (armas, rasgos, trucos multihaz).
+export function impactosDe(spec, stats) {
+  if (spec.golpes === 'turno') return ataquesTurno(stats.clase, stats.nivelPJ) + (spec.golpeExtra || 0);
+  if (spec.golpes === 'haces' || spec.haces) return hacesTruco(stats.nivelPJ);
+  return 1;
+}
+
+// Bono de ataque de una spec genérica (característica o cuerpo a cuerpo).
+export function bonoAtaqueDe(spec, stats) {
+  const comp = stats.comp ?? 2;
+  if (spec.atkStat === 'mel') return (stats.mel ?? 3) + comp;
+  return attackBonus(stats.mod ?? 3, comp);
+}
+
 /**
  * Calculadora genérica para los hechizos añadidos: mismo modelo que el Excel
  * (crítico +5% en ataques, mitad al salvar salvo saveFrac 0), con dados por partes
  * [{n, c(caras), r(tipo de resistencia)}], escalado por nivel y resistencias.
  */
+const RES_POR_TIPO = {
+  'fuego': 'fuego', 'frío': 'frio', 'necrótico': 'necrotico', 'fuerza': 'fuerza',
+  'contundente': 'contundente', 'perforante': 'perforante', 'radiante': 'radiante',
+  'relámpago': 'relampago', 'ácido': 'acido', 'veneno': 'veneno', 'trueno': 'trueno',
+  'cortante': 'cortante', 'psíquico': 'psiquico',
+};
+
 export function genericDamage(spec, nivel, ctx) {
   const { stats } = ctx;
   const res = (k) => (!k ? 1 : stats.res?.[k] ?? 1);
+  const nivelEf = Math.min(nivel, spec.tope ?? 9);
   const subidas = spec.cada
-    ? Math.floor((nivel - spec.nivelBase) / spec.cada)
-    : nivel - spec.nivelBase;
+    ? Math.floor((nivelEf - spec.nivelBase) / spec.cada)
+    : nivelEf - spec.nivelBase;
+  // Trucos: no usan espacio; dados según nivel de personaje.
+  let baseParts = spec.dadosPJ ? spec.dadosPJ(stats.nivelPJ ?? 5) : spec.base;
+  if (spec.truco) {
+    const n = hacesTruco(stats.nivelPJ);
+    const r = RES_POR_TIPO[spec.tipoDano] || null;
+    baseParts = spec.haces ? [{ n: 1, c: spec.caras, r }] : [{ n, c: spec.caras, r }];
+  }
   // media de dados por tipo de resistencia
   const dice = {};
   const add = (parts, mult) => {
@@ -168,45 +213,61 @@ export function genericDamage(spec, nivel, ctx) {
       dice[k] = (dice[k] || 0) + p.n * mult * avgDie(p.c);
     }
   };
-  add(spec.base, 1);
+  add(baseParts, 1);
   add(spec.step, subidas);
-  const fijo = (spec.fijo || 0) + (spec.bonoMod ? stats.mod : 0);
+  const fijo = (spec.fijo || 0) + (spec.bonoMod ? stats.mod ?? 3 : 0);
   const keys = Object.keys(dice);
   const fijoKey = spec.fijoR || keys[0] || '_';
-  const dmgKey = (k) => (dice[k] || 0) + (k === fijoKey ? fijo : 0);
 
-  const saveMap = { des: [ctx.fDes, ctx.pSdes], con: [ctx.fCon, ctx.pScon], sab: [ctx.fSab, ctx.pSsab] };
+  const saveMap = {
+    des: [ctx.fDes, ctx.pSdes, 'DES'], con: [ctx.fCon, ctx.pScon, 'CON'],
+    sab: [ctx.fSab, ctx.pSsab, 'SAB'], fue: [ctx.fFue, ctx.pSfue, 'FUE'],
+    int: [ctx.fInt, ctx.pSint, 'INT'],
+  };
   let dmg = 0, prob = null, probLabel = '';
   if (spec.mech === 'atk') {
+    const ab = bonoAtaqueDe(spec, stats);
+    const pHm = pHit(stats.ca ?? 15, ab);
+    const hits = impactosDe(spec, stats);
+    const modGolpe = spec.danoMod === 'mel' ? (stats.mel ?? 3) : spec.danoMod === 'mod' ? (stats.mod ?? 3) : 0;
+    let porGolpe = modGolpe * pHm; // el mod no se dobla con crítico ni tiene tipo
     for (const k of keys) {
       const dAvg = dice[k] || 0;
       const fAvg = k === fijoKey ? fijo : 0;
-      dmg += (dAvg * (ctx.pH + 0.05) + fAvg * ctx.pH) * res(k === '_' ? null : k);
+      porGolpe += (dAvg * (pHm + 0.05) + fAvg * pHm) * res(k === '_' ? null : k);
     }
-    prob = ctx.pH;
-    probLabel = `${(ctx.pH * 100).toFixed(0)}% impacto (+5% crít.)`;
+    dmg = porGolpe * hits;
+    prob = pHm;
+    probLabel = `${(pHm * 100).toFixed(0)}% impacto (+5% crít.)${hits > 1 ? ` ×${hits} golpes` : ''}`;
   } else if (spec.mech === 'auto') {
-    for (const k of keys) dmg += dmgKey(k) * res(k === '_' ? null : k);
+    for (const k of keys) dmg += ((dice[k] || 0) + (k === fijoKey ? fijo : 0)) * res(k === '_' ? null : k);
     prob = 1;
     probLabel = spec.mechNote || '100% (sin tirada)';
   } else {
-    const [pFail, pSave] = saveMap[spec.mech] || saveMap.des;
+    const [pFail, pSave, sLabel] = saveMap[spec.mech] || saveMap.des;
     const frac = spec.saveFrac ?? 0.5;
-    for (const k of keys) dmg += dmgKey(k) * (pFail + pSave * frac) * res(k === '_' ? null : k);
+    for (const k of keys) dmg += ((dice[k] || 0) + (k === fijoKey ? fijo : 0)) * (pFail + pSave * frac) * res(k === '_' ? null : k);
     prob = pFail;
-    const sabLabel = spec.mech === 'sab' ? 'SAB' : spec.mech === 'con' ? 'CON' : 'DES';
-    probLabel = `${(pFail * 100).toFixed(0)}% fallo ${sabLabel}${frac === 0 ? ' (0 si salva)' : ''}`;
+    probLabel = `${(pFail * 100).toFixed(0)}% fallo ${sLabel}${frac === 0 ? ' (0 si salva)' : ''}`;
   }
-  return { dmg, lanzable: true, prob, probLabel, dados: dadosGeneric(spec) };
+  return { dmg, lanzable: true, prob, probLabel, dados: dadosGeneric(spec, stats) };
 }
 
-export function dadosGeneric(spec) {
+export function dadosGeneric(spec, stats) {
   const fmtParts = (parts) => (parts || []).map((p) => `${p.n}d${p.c}`).join(' + ');
-  let s = fmtParts(spec.base);
-  if (spec.fijo) s += `+${spec.fijo}`;
-  if (spec.bonoMod) s += '+mod';
-  if (spec.step?.length) s += ` (+${fmtParts(spec.step)}${spec.cada ? ` cada ${spec.cada} niveles` : '/nivel'})`;
-  return s;
+  if (spec.truco) {
+    const n = spec.haces ? 1 : hacesTruco(stats?.nivelPJ ?? 5);
+    return spec.haces ? `1d${spec.caras} ×${hacesTruco(stats?.nivelPJ ?? 5)} haces` : `${n}d${spec.caras} (truco)`;
+  }
+  let base = spec.dadosPJ ? fmtParts(spec.dadosPJ(stats?.nivelPJ ?? 5)) : fmtParts(spec.base);
+  if (!base) base = `+${spec.fijo ?? 1}`;
+  else if (spec.fijo) base += `+${spec.fijo}`;
+  if (spec.bonoMod) base += '+mod';
+  if (spec.danoMod) base += `+${spec.danoMod === 'mel' ? 'mel' : 'mod'}`;
+  if (spec.step?.length) base += ` (+${fmtParts(spec.step)}${spec.cada ? ` cada ${spec.cada} niveles` : '/nivel'})`;
+  if (spec.tope) base += ` (máx. N${spec.tope})`;
+  if (spec.truco) base += ' ×nv. PJ';
+  return base;
 }
 
 export function compareAtLevel(nivel, stats, ids = null) {
@@ -262,7 +323,7 @@ export const fmt = (v) => (v == null ? '–' : (Math.round(v * 10) / 10).toFixed
  */
 export function zeroRisk(spellOrId, nivel, stats) {
   const spell = typeof spellOrId === 'string' ? getSpell(spellOrId) : spellOrId;
-  const { mod, comp, ca, des, sab } = stats;
+  const { mod, comp, ca, des } = stats;
   if (nivel < spell.nivelMin || nivel > spell.nivelMax) return null;
   const bono = attackBonus(mod, comp);
   const dc = spellDC(mod, comp);
@@ -270,8 +331,12 @@ export function zeroRisk(spellOrId, nivel, stats) {
   const pSdes = pSaveSuccess(dc, des);
   if (spell.generic) {
     if (spell.mech === 'auto') return 0;
-    if (spell.mech === 'atk') return 1 - pH;
-    const ps = spell.mech === 'con' ? pSaveSuccess(dc, stats.con) : spell.mech === 'sab' ? pSaveSuccess(dc, sab ?? 2) : pSdes;
+    if (spell.mech === 'atk') {
+      const p = pHit(stats.ca ?? 15, bonoAtaqueDe(spell, stats));
+      return Math.pow(1 - p, impactosDe(spell, stats));
+    }
+    const dc2 = spellDC(stats.mod ?? 3, stats.comp ?? 2);
+    const ps = { des: pSaveSuccess(dc2, stats.des), con: pSaveSuccess(dc2, stats.con), sab: pSaveSuccess(dc2, stats.sab ?? 2), fue: pSaveSuccess(dc2, stats.fue ?? 2), int: pSaveSuccess(dc2, stats.int ?? 0) }[spell.mech] ?? pSdes;
     return (spell.saveFrac ?? 0.5) === 0 ? ps : 0;
   }
   switch (spell.id) {

@@ -5,6 +5,7 @@ import {
   Orbit, Moon, Droplets, CloudLightning, Footprints, Wind, Mountain,
   PlugZap, Timer, Sunrise, CloudFog, BrickWall, Cone, Bug, HeartPulse,
   Hand, Target, FlaskConical, Biohazard, Brain, Volume2, Slice,
+  Navigation, Eye, Maximize2, X, LayoutGrid,
 } from 'lucide-react';
 
 const MAP = {
@@ -14,6 +15,7 @@ const MAP = {
   Orbit, Moon, Droplets, CloudLightning, Footprints, Wind, Mountain,
   PlugZap, Timer, Sunrise, CloudFog, BrickWall, Cone, Bug, HeartPulse,
   Hand, Target, FlaskConical, Biohazard, Brain, Volume2, Slice,
+  Navigation, Eye, Maximize2, X, LayoutGrid,
 };
 
 /** Icono Lucide por nombre, teñido con el color dado. */

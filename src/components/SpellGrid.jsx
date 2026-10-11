@@ -9,6 +9,9 @@ const FILTROS = [
   { id: 'ataque', label: 'Ataque (CA)' },
   { id: 'salv-des', label: 'Salv. DES' },
   { id: 'salv-con', label: 'Salv. CON' },
+  { id: 'salv-sab', label: 'Salv. SAB' },
+  { id: 'salv-fue', label: 'Salv. FUE' },
+  { id: 'salv-int', label: 'Salv. INT' },
   { id: 'auto', label: 'Automático' },
   { id: 'mixto', label: 'Mixto' },
 ];
@@ -33,7 +36,7 @@ export default function SpellGrid({ stats, nivel, spells }) {
           ))}
         </div>
       </div>
-      <p className="muted small">El daño mostrado es al <b>nivel {nivel}</b> seleccionado (sincronizado con el ganador y el duelo). Sin trucos: escalan con nivel de personaje, no con espacio.</p>
+      <p className="muted small">El daño mostrado es al <b>nivel {nivel}</b> seleccionado (sincronizado con el ganador y el duelo). Los trucos no gastan espacio: escalan con tu nivel de personaje. El melé usa tu Mod. cuerpo a cuerpo y tus ataques por turno.</p>
       <div className="spell-grid">
         {list.map((s) => {
           const r = detail(s);

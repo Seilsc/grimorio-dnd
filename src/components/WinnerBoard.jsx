@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import {
   bestAndSecond, compareAtLevel, fmt, zeroRisk,
-  ruptureScan, activeRes, RES_MULT_LABEL, attackBonus,
+  ruptureScan, activeRes, RES_MULT_LABEL, bonoAtaqueDe,
 } from '../lib/damage.js';
 import { getSpell, RES_TYPES } from '../data/spells.js';
 import SpellIcon from './SpellIcon.jsx';
@@ -29,6 +29,9 @@ const RUPTURE_VARS = [
   { key: 'ca', label: 'CA' },
   { key: 'des', label: 'DES' },
   { key: 'con', label: 'CON' },
+  { key: 'sab', label: 'SAB' },
+  { key: 'fue', label: 'FUE' },
+  { key: 'int', label: 'INT' },
 ];
 
 function resSummary(stats) {
@@ -40,16 +43,18 @@ function resSummary(stats) {
 
 function explainBullets(best, second, stats) {
   const out = [];
-  const bono = attackBonus(stats.mod, stats.comp);
   if (best.spell.tirada === 'auto') {
     out.push({ icon: Info, text: `${best.spell.nombre} no tira nada: sus ${best.dados} son daño garantizado, inmune a la CA y a las salvaciones.` });
   } else if (best.spell.tirada === 'ataque') {
-    out.push({ icon: Info, text: `Ataca con +${bono} contra CA ${stats.ca} (${best.probLabel}). Sus ${best.dados} rinden más que el resto a este nivel.` });
+    out.push({ icon: Info, text: `Ataca con +${bonoAtaqueDe(best.spell, stats)} contra CA ${stats.ca} (${best.probLabel}). Sus ${best.dados} rinden más que el resto a este nivel.` });
     if (stats.ca >= 17) out.push({ icon: Info, text: `Con una CA tan alta (${stats.ca}), los ataques sufren; aun así compensa por volumen de dados.` });
+  } else if (best.spell.tirada.startsWith('salv-')) {
+    const sk = best.spell.tirada.slice(5).toLowerCase();
+    const sn = { des: 'DES', con: 'CON', sab: 'SAB', fue: 'FUE', int: 'INT' }[sk] ?? sk.toUpperCase();
+    const sv = { des: stats.des, con: stats.con, sab: stats.sab ?? 2, fue: stats.fue ?? 2, int: stats.int ?? 0 }[sk] ?? 0;
+    out.push({ icon: Info, text: `El objetivo falla la salvación el ${(best.prob * 100).toFixed(0)}% de las veces (su ${sn} es ${sv > 0 ? `+${sv}` : sv}).` });
   } else {
-    const sb = best.spell.tirada === 'salv-des' ? stats.des : stats.con;
-    const sn = best.spell.tirada === 'salv-des' ? 'DES' : 'CON';
-    out.push({ icon: Info, text: `El objetivo falla la salvación el ${(best.prob * 100).toFixed(0)}% de las veces (su ${sn} es ${sb > 0 ? `+${sb}` : sb}).` });
+    out.push({ icon: Info, text: `${best.spell.nombre} combina ataque y salvación (${best.probLabel}).` });
   }
   if (second) {
     const diff = best.dmg - second.dmg;
@@ -133,7 +138,10 @@ export default function WinnerBoard({ nivel, setNivel, stats, ids }) {
   const defaultVar = !best ? 'ca'
     : best.spell.tirada === 'ataque' ? 'ca'
       : best.spell.tirada === 'salv-des' ? 'des'
-        : best.spell.tirada === 'salv-con' ? 'con' : 'ca';
+        : best.spell.tirada === 'salv-con' ? 'con'
+          : best.spell.tirada === 'salv-sab' ? 'sab'
+            : best.spell.tirada === 'salv-fue' ? 'fue'
+              : best.spell.tirada === 'salv-int' ? 'int' : 'ca';
 
   const copyVerdict = async () => {
     if (!best) return;

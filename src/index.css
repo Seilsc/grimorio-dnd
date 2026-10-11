@@ -62,16 +62,35 @@ body {
 
 .wrap { max-width: 1150px; margin: 0 auto; padding: 0 18px 60px; }
 
-/* PESTAÑAS: chapas de cuero con remaches */
+/* PESTAÑAS: chapas de cuero con remaches + modos */
+.tabs-wrap { position: sticky; top: 55px; z-index: 40; margin-top: 18px; }
 .tabs {
-  display: flex; gap: 8px; margin-top: 18px;
+  display: flex; gap: 8px;
   background: linear-gradient(180deg, #1d1207, #120b04);
   border: 1px solid var(--bronze-dark);
   border-bottom: 3px double var(--bronze);
   border-radius: 8px; padding: 8px;
-  position: sticky; top: 55px; z-index: 40;
   overflow-x: auto;
   box-shadow: 0 6px 16px #00000088;
+}
+.modebar {
+  display: flex; gap: 6px; margin-top: 6px;
+  background: linear-gradient(180deg, #1d1207, #120b04);
+  border: 1px solid var(--bronze-dark);
+  border-radius: 8px; padding: 6px;
+  box-shadow: 0 6px 16px #00000088;
+}
+.mode {
+  flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  background: transparent; color: var(--parch-deep);
+  border: 1px solid transparent; border-radius: 6px; padding: 8px 10px;
+  font-family: 'Cinzel', serif; font-size: 12.5px; font-weight: 700; letter-spacing: 0.5px;
+  cursor: pointer; white-space: nowrap;
+}
+.mode:hover { color: var(--gold-soft); }
+.mode.active {
+  background: linear-gradient(180deg, var(--parch), var(--parch2));
+  color: var(--ink); border: 1px solid var(--bronze-dark);
 }
 .tab {
   flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
@@ -415,6 +434,28 @@ table.compare { width: 100%; border-collapse: collapse; min-width: 900px; font-s
   border: 1px solid var(--bronze-dark);
   outline: 3px double var(--bronze); outline-offset: 3px;
   border-radius: var(--radius); padding: 12px; margin: 8px 4px;
+}
+/* Modal de gráfica a pantalla completa */
+.chart-modal {
+  position: fixed; inset: 0; z-index: 100;
+  background: #000000d9;
+  display: flex; align-items: center; justify-content: center;
+  padding: 22px;
+}
+.chart-modal-box {
+  width: min(1250px, 100%); max-height: 92vh; overflow: auto;
+  background:
+    var(--grain),
+    linear-gradient(180deg, var(--parch), var(--parch2));
+  border: 1px solid var(--bronze-dark);
+  outline: 3px double var(--gold); outline-offset: 3px;
+  border-radius: 8px; padding: 16px 18px 20px;
+  box-shadow: 0 20px 60px #000;
+}
+.chart-modal-head {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 10px; margin-bottom: 8px;
+  font-family: 'Cinzel', serif; color: var(--ink);
 }
 
 /* GRIMORIO */

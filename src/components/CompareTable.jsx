@@ -1,44 +1,41 @@
-import { useState } from 'react';
 import { Table2, Crown, Eye, EyeOff } from 'lucide-react';
 import { SPELLS } from '../data/spells.js';
 import { fullMatrix, bestAndSecond, fmt } from '../lib/damage.js';
 import SpellIcon from './SpellIcon.jsx';
 
-export default function CompareTable({ stats, spells }) {
+export default function CompareTable({ stats, spells, vis, setVis }) {
   const list = spells ?? SPELLS;
-  const [visible, setVisible] = useState(() =>
-    Object.fromEntries(list.map((s) => [s.id, true]))
-  );
-  const matrix = fullMatrix(stats, list.map((s) => s.id));
+  const ids = list.map((s) => s.id);
+  const shownMap = vis ?? Object.fromEntries(ids.map((id) => [id, true]));
+  const matrix = fullMatrix(stats, ids);
   const levels = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-  // máximo y mejor por nivel (una sola vez por render)
   const maxByLvl = {};
   const bestByLvl = {};
   for (const l of levels) {
     let m = 0;
     for (const s of list) { const v = matrix[l][s.id].dmg; if (v != null && v > m) m = v; }
     maxByLvl[l] = m || 1;
-    bestByLvl[l] = bestAndSecond(l, stats, list.map((s) => s.id)).best?.spell.id ?? null;
+    bestByLvl[l] = bestAndSecond(l, stats, ids).best?.spell.id ?? null;
   }
 
-  const shown = list.filter((s) => visible[s.id]);
-  const toggle = (id) => setVisible((v) => ({ ...v, [id]: !v[id] }));
-  const showAll = () => setVisible(Object.fromEntries(list.map((s) => [s.id, true])));
-  const hideAll = () => setVisible(Object.fromEntries(list.map((s) => [s.id, false])));
+  const shown = list.filter((s) => shownMap[s.id]);
+  const toggle = (id) => setVis && setVis((v) => ({ ...v, [id]: !v[id] }));
+  const showAll = () => setVis && setVis((v) => ({ ...v, ...Object.fromEntries(ids.map((id) => [id, true])) }));
+  const hideAll = () => setVis && setVis((v) => ({ ...v, ...Object.fromEntries(ids.map((id) => [id, false])) }));
 
   return (
     <section className="panel" id="tabla">
       <h2><Table2 size={20} /> Daño medio de cada hechizo contra este objetivo</h2>
-      <p className="muted small">« – » = no se puede lanzar con ese espacio. La celda de lacre es la mejor de su columna.</p>
+      <p className="muted small">« – » = no se puede lanzar con ese espacio. La celda de lacre es la mejor de su columna. Los trucos no gastan espacio.</p>
       <div className="chips chips-row">
         {list.map((s) => (
           <button
             key={s.id}
-            className={`chip ${visible[s.id] ? 'on' : ''}`}
+            className={`chip ${shownMap[s.id] ? 'on' : ''}`}
             style={{ '--c': s.color }}
             onClick={() => toggle(s.id)}
-            title={visible[s.id] ? `Ocultar ${s.nombre}` : `Mostrar ${s.nombre}`}
+            title={shownMap[s.id] ? `Ocultar ${s.nombre} (también en la gráfica)` : `Mostrar ${s.nombre} (también en la gráfica)`}
           >
             <SpellIcon spell={s} size={13} /> {s.nombre}
           </button>
