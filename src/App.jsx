@@ -8,7 +8,6 @@ import DuelArena from './components/DuelArena.jsx';
 import CompareTable from './components/CompareTable.jsx';
 import DamageChart from './components/DamageChart.jsx';
 import SpellGrid from './components/SpellGrid.jsx';
-import Methodology from './components/Methodology.jsx';
 
 export default function App() {
   const [stats, setStats] = useState({ mod: 3, comp: 2, ca: 15, des: 2, con: 3 });
@@ -46,9 +45,6 @@ export default function App() {
         )}
         {tab === 'grimorio' && (
           <SpellGrid stats={stats} nivel={nivel} />
-        )}
-        {tab === 'metodo' && (
-          <Methodology />
         )}
       </main>
     </div>

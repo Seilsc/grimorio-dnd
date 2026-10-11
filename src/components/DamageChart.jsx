@@ -48,11 +48,12 @@ export default function DamageChart({ stats, highlight = [] }) {
       <div className="chart-box">
         <ResponsiveContainer width="100%" height={340}>
           <LineChart data={data} margin={{ top: 10, right: 20, left: -10, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#3b3654" />
-            <XAxis dataKey="nivel" stroke="#cbbf9a" />
-            <YAxis stroke="#cbbf9a" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#a68b55" />
+            <XAxis dataKey="nivel" stroke="#6d5a3e" />
+            <YAxis stroke="#6d5a3e" />
             <Tooltip
-              contentStyle={{ background: '#1a1625', border: '1px solid #c9a227', color: '#f5e6c8' }}
+              contentStyle={{ background: '#241708', border: '1px solid #8a6d2f', color: '#e9d9ae' }}
+              labelStyle={{ color: '#f0d878' }}
             />
             <Legend />
             {SPELLS.filter((s) => visible[s.id]).map((s) => (

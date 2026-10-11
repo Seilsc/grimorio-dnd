@@ -1,11 +1,10 @@
-import { Crown, Swords, Table2, BookOpen, ScrollText } from 'lucide-react';
+import { Crown, Swords, Table2, BookOpen } from 'lucide-react';
 
 const TABS = [
   { id: 'mejor', label: 'Mejor hechizo', icon: Crown },
   { id: 'duelo', label: 'Duelo 1v1', icon: Swords },
   { id: 'tabla', label: 'Comparativa', icon: Table2 },
   { id: 'grimorio', label: 'Grimorio', icon: BookOpen },
-  { id: 'metodo', label: 'Cómo se calcula', icon: ScrollText },
 ];
 
 export default function Tabs({ active, onChange }) {
