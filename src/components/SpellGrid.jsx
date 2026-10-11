@@ -3,7 +3,8 @@ import { BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
 import { SPELLS, claseLabel } from '../data/spells.js';
 import { spellDamage, fmt } from '../lib/damage.js';
 import SpellIcon from './SpellIcon.jsx';
-import SpellLink from './SpellLink.jsx';
+import SpellLink, { BookLink } from './SpellLink.jsx';
+import Ficha from './Ficha.jsx';
 
 const FILTROS = [
   { id: 'todos', label: 'Todos' },
@@ -55,7 +56,7 @@ export default function SpellGrid({ stats, nivel, spells }) {
                     <span className="badge">{s.tiradaLabel}</span>
                     <span className="badge dmg" style={{ '--c': s.color }}>{s.tipoDano}</span>
                     <span className="badge lvl">Nv {s.nivelMin}{s.nivelMin !== s.nivelMax ? `–${s.nivelMax}` : ''}</span>
-                    {s.libro && <span className="badge book">{s.libro}</span>}
+                    <BookLink libro={s.libro} />
                   </div>
                   {s.clases?.length > 0 && (
                     <div className="muted small classes-line">{s.clases.map(claseLabel).join(' · ')}</div>
@@ -73,6 +74,7 @@ export default function SpellGrid({ stats, nivel, spells }) {
                 )}
               </div>
               <p className="muted small">{s.notas}</p>
+              <Ficha entry={s} subtitulo={`${s.tiradaLabel} · ${r.dados}`} />
               <button className="link" onClick={() => setAbierto(open ? null : s.id)}>
                 {open ? <>Ocultar detalle <ChevronUp size={13} /></> : <>Ver detalle por nivel <ChevronDown size={13} /></>}
               </button>

@@ -9,7 +9,8 @@ import {
 import { CURAS, claseLabel } from '../data/spells.js';
 import { curaDe, fmt, modLanz, caracLanzDe } from '../lib/damage.js';
 import SpellIcon from './SpellIcon.jsx';
-import SpellLink from './SpellLink.jsx';
+import SpellLink, { BookLink } from './SpellLink.jsx';
+import Ficha from './Ficha.jsx';
 import Tabs from './Tabs.jsx';
 import { Crown as CrownIcon, Swords as SwordsIcon, Table2 as Table2Icon, BookOpen as BookOpenIcon } from 'lucide-react';
 
@@ -338,7 +339,7 @@ export default function Curacion({ stats }) {
                   <h3><SpellLink entry={c}>{c.nombre}</SpellLink></h3>
                   <div className="spell-badges">
                     <span className="badge">Nv {c.min}{c.min !== c.max ? `–${c.max}` : ''}</span>
-                    <span className="badge lvl">{c.libro}</span>
+                    <BookLink libro={c.libro} />
                   </div>
                   <div className="muted small classes-line">{c.clases.map(claseLabel).join(' · ')}</div>
                 </div>
@@ -356,6 +357,7 @@ export default function Curacion({ stats }) {
                 )}
               </div>
               {!r.especial && <p className="muted small">{c.notas}</p>}
+              <Ficha entry={c} subtitulo={`Nv ${c.min}${c.min !== c.max ? `–${c.max}` : ''} · ${r.dados}`} />
             </article>
           );
         })}

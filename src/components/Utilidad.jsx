@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Compass, Search } from 'lucide-react';
 import { UTILS, claseLabel } from '../data/spells.js';
 import SpellIcon from './SpellIcon.jsx';
-import SpellLink from './SpellLink.jsx';
+import SpellLink, { BookLink } from './SpellLink.jsx';
+import Ficha from './Ficha.jsx';
 
 const TAGS = ['control', 'movimiento', 'exploración', 'social', 'información', 'defensa', 'sigilo', 'invocación', 'supervivencia'];
 
@@ -56,13 +57,14 @@ export default function Utilidad({ stats }) {
                 <h3><SpellLink entry={u}>{u.nombre}</SpellLink></h3>
                 <div className="spell-badges">
                   <span className="badge">{u.nivel === 0 ? 'Truco' : `Nv ${u.nivel}`}</span>
-                  <span className="badge lvl">{u.libro}</span>
+                  <BookLink libro={u.libro} />
                   {u.tags.map((t) => <span key={t} className="badge tag">{t}</span>)}
                 </div>
                 <div className="muted small classes-line">{u.clases.map(claseLabel).join(' · ')}</div>
               </div>
             </div>
             <p className="muted small" style={{ marginTop: 8 }}>{u.desc}</p>
+            <Ficha entry={u} subtitulo={u.nivel === 0 ? 'Truco' : `Nivel ${u.nivel}`} />
           </article>
         ))}
       </div>

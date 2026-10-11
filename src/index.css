@@ -288,6 +288,28 @@ code {
 /* Selector de clase */
 .class-label { display: grid; gap: 5px; font-size: 14px; font-weight: 700; color: var(--ink); margin: 8px 0 4px; }
 
+/* Ficha completa desplegable */
+.ficha { margin-top: 4px; }
+.ficha-body {
+  background: #00000018;
+  border: 1px solid var(--bronze-dark);
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-top: 6px;
+  box-shadow: inset 0 0 24px #8a6d2f33;
+}
+.ficha-body dl { margin: 0; display: grid; gap: 4px; font-size: 13.5px; }
+.ficha-body dl > div { display: flex; gap: 8px; align-items: baseline; }
+.ficha-body dt {
+  font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700;
+  color: var(--bronze-dark); min-width: 92px; flex: none;
+  letter-spacing: 0.4px;
+}
+.ficha-body dd { margin: 0; color: var(--ink); }
+.ficha-res { font-size: 14px; color: var(--ink); margin: 9px 0 4px; }
+a.badge { text-decoration: none; cursor: pointer; }
+a.badge.book:hover { border-color: var(--gold); color: var(--gold-soft); box-shadow: 0 0 6px #c9a22755; }
+
 /* Enlaces a la ficha oficial (D&D Beyond) */
 .spell-link {
   color: inherit;
