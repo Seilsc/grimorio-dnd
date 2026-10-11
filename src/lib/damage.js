@@ -13,6 +13,25 @@ export const pHit = (ca, bono) => (Math.max(0, 20 - Math.max(2, ca - bono)) + 1)
 export const pSaveSuccess = (dc, bonoSalv) =>
   Math.max(0, Math.min(1, (21 - (dc - bonoSalv)) / 20));
 
+// El personaje pone PUNTUACIONES (1-30); todo lo demás se calcula solo.
+// El objetivo, en cambio, usa bonos directos (como en su ficha).
+export const modDe = (score) => Math.floor(((score ?? 10) - 10) / 2);
+export const compDe = (stats) => 2 + Math.floor((((stats.nivelPJ ?? 4)) - 1) / 4);
+const CARAC_LANZ = {
+  artifice: 'int', bardo: 'car', caballero: 'int', clerigo: 'sab', druida: 'sab',
+  explorador: 'sab', guerrero: 'int', hechicero: 'car', brujo: 'car', mago: 'int',
+  monje: 'sab', paladin: 'car', picaro: 'int', 'picaro-arcano': 'int', todas: 'int',
+};
+export const caracLanzDe = (stats) => CARAC_LANZ[stats.clase] || 'int';
+export const modLanz = (stats) => modDe(stats[caracLanzDe(stats)]);
+// Armas/rasgos sutiles usan lo mejor entre FUE y DES; el resto, FUE.
+const SUTILES = new Set([
+  'm-daga', 'm-espada-corta', 'm-cimitarra', 'm-estoque',
+  'm-artes-marciales', 'm-ataque-furtivo', 'm-floreo', 'm-marca-cazador',
+]);
+export const modMel = (spec, stats) =>
+  SUTILES.has(spec.id) ? Math.max(modDe(stats.fue), modDe(stats.des)) : modDe(stats.fue);
+
 const attackDmg = (nDados, caras, probHit) => nDados * avgDie(caras) * (probHit + 0.05);
 
 const saveDmg = (nDados, caras, fijo, pFail, pSave, fraction) =>
@@ -57,7 +76,9 @@ export function dadosStr(spell, nivel) {
  */
 export function spellDamage(spellOrId, nivel, stats) {
   const spell = typeof spellOrId === 'string' ? getSpell(spellOrId) : spellOrId;
-  const { mod, comp, ca, des, con, sab, fue, int } = stats;
+  const { ca, sDes, sCon, sSab, sFue, sInt } = stats;
+  const mod = modLanz(stats);
+  const comp = compDe(stats);
   const res = (k) => stats.res?.[k] ?? 1;
   const bono = attackBonus(mod, comp);
   const dc = spellDC(mod, comp);
@@ -71,11 +92,11 @@ export function spellDamage(spellOrId, nivel, stats) {
   }
 
   const pH = pHit(ca, bono);
-  const pSdes = pSaveSuccess(dc, des);
-  const pScon = pSaveSuccess(dc, con);
-  const pSsab = pSaveSuccess(dc, sab ?? 2);
-  const pSfue = pSaveSuccess(dc, fue ?? 2);
-  const pSint = pSaveSuccess(dc, int ?? 0);
+  const pSdes = pSaveSuccess(dc, sDes ?? 2);
+  const pScon = pSaveSuccess(dc, sCon ?? 3);
+  const pSsab = pSaveSuccess(dc, sSab ?? 2);
+  const pSfue = pSaveSuccess(dc, sFue ?? 2);
+  const pSint = pSaveSuccess(dc, sInt ?? 0);
   const fDes = 1 - pSdes, fCon = 1 - pScon, fSab = 1 - pSsab, fFue = 1 - pSfue, fInt = 1 - pSint;
 
   // Hechizos añadidos (spec genérica): mismo modelo probabilístico que el Excel.
@@ -174,9 +195,9 @@ export function impactosDe(spec, stats) {
 
 // Bono de ataque de una spec genérica (característica o cuerpo a cuerpo).
 export function bonoAtaqueDe(spec, stats) {
-  const comp = stats.comp ?? 2;
-  if (spec.atkStat === 'mel') return (stats.mel ?? 3) + comp;
-  return attackBonus(stats.mod ?? 3, comp);
+  const comp = compDe(stats);
+  if (spec.atkStat === 'mel') return modMel(spec, stats) + comp;
+  return modLanz(stats) + comp;
 }
 
 /**
@@ -215,7 +236,7 @@ export function genericDamage(spec, nivel, ctx) {
   };
   add(baseParts, 1);
   add(spec.step, subidas);
-  const fijo = (spec.fijo || 0) + (spec.bonoMod ? stats.mod ?? 3 : 0);
+  const fijo = (spec.fijo || 0) + (spec.bonoMod ? modLanz(stats) : 0);
   const keys = Object.keys(dice);
   const fijoKey = spec.fijoR || keys[0] || '_';
 
@@ -229,7 +250,7 @@ export function genericDamage(spec, nivel, ctx) {
     const ab = bonoAtaqueDe(spec, stats);
     const pHm = pHit(stats.ca ?? 15, ab);
     const hits = impactosDe(spec, stats);
-    const modGolpe = spec.danoMod === 'mel' ? (stats.mel ?? 3) : spec.danoMod === 'mod' ? (stats.mod ?? 3) : 0;
+    const modGolpe = spec.danoMod === 'mel' ? modMel(spec, stats) : spec.danoMod === 'mod' ? modLanz(stats) : 0;
     let porGolpe = modGolpe * pHm; // el mod no se dobla con crítico ni tiene tipo
     for (const k of keys) {
       const dAvg = dice[k] || 0;
@@ -323,20 +344,26 @@ export const fmt = (v) => (v == null ? '–' : (Math.round(v * 10) / 10).toFixed
  */
 export function zeroRisk(spellOrId, nivel, stats) {
   const spell = typeof spellOrId === 'string' ? getSpell(spellOrId) : spellOrId;
-  const { mod, comp, ca, des } = stats;
+  const { ca } = stats;
   if (nivel < spell.nivelMin || nivel > spell.nivelMax) return null;
+  const mod = modLanz(stats);
+  const comp = compDe(stats);
   const bono = attackBonus(mod, comp);
   const dc = spellDC(mod, comp);
-  const pH = pHit(ca, bono);
-  const pSdes = pSaveSuccess(dc, des);
+  const pH = pHit(ca ?? 15, bono);
+  const pSdes = pSaveSuccess(dc, stats.sDes ?? 2);
   if (spell.generic) {
     if (spell.mech === 'auto') return 0;
     if (spell.mech === 'atk') {
       const p = pHit(stats.ca ?? 15, bonoAtaqueDe(spell, stats));
       return Math.pow(1 - p, impactosDe(spell, stats));
     }
-    const dc2 = spellDC(stats.mod ?? 3, stats.comp ?? 2);
-    const ps = { des: pSaveSuccess(dc2, stats.des), con: pSaveSuccess(dc2, stats.con), sab: pSaveSuccess(dc2, stats.sab ?? 2), fue: pSaveSuccess(dc2, stats.fue ?? 2), int: pSaveSuccess(dc2, stats.int ?? 0) }[spell.mech] ?? pSdes;
+    const dc2 = spellDC(mod, comp);
+    const ps = {
+      des: pSaveSuccess(dc2, stats.sDes ?? 2), con: pSaveSuccess(dc2, stats.sCon ?? 3),
+      sab: pSaveSuccess(dc2, stats.sSab ?? 2), fue: pSaveSuccess(dc2, stats.sFue ?? 2),
+      int: pSaveSuccess(dc2, stats.sInt ?? 0),
+    }[spell.mech] ?? pSdes;
     return (spell.saveFrac ?? 0.5) === 0 ? ps : 0;
   }
   switch (spell.id) {

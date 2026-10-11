@@ -2,15 +2,14 @@ import { useMemo, useState } from 'react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
-import { TrendingUp, Maximize2, X, Eye, EyeOff, Crown } from 'lucide-react';
+import { TrendingUp, Maximize2, X, Crown } from 'lucide-react';
 import { SPELLS } from '../data/spells.js';
 import { spellDamage, compareAtLevel } from '../lib/damage.js';
-import SpellIcon from './SpellIcon.jsx';
 
 // Paleta generada por ángulo dorado: tonos distintos y oscuros para el pergamino.
 const lineColor = (i) => `hsl(${Math.round((i * 137.508) % 360)}, 62%, 30%)`;
 
-function ChartBody({ data, list, visible, highlight, height }) {
+function ChartBody({ data, list, visible, highlight, height, showLegend = true }) {
   return (
     <ResponsiveContainer width="100%" height={height}>
       <LineChart data={data} margin={{ top: 10, right: 20, left: -6, bottom: 30 }}>
@@ -22,7 +21,9 @@ function ChartBody({ data, list, visible, highlight, height }) {
           labelStyle={{ color: '#f0d878' }}
           cursor={{ stroke: '#8a6d2f' }}
         />
-        <Legend verticalAlign="bottom" height={30} wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
+        {showLegend && (
+          <Legend verticalAlign="bottom" height={30} wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
+        )}
         {list.filter((s) => visible[s.id]).map((s) => (
           <Line
             key={s.id}
@@ -60,9 +61,6 @@ export default function DamageChart({ stats, spells, nivel = 3, highlight = [], 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stats, nivel, list.length, ids.join(',')]);
 
-  const toggle = (id) => setVis && setVis((v) => ({ ...v, [id]: !v[id] }));
-  const showAll = () => setVis && setVis((v) => ({ ...v, ...Object.fromEntries(ids.map((id) => [id, true])) }));
-  const hideAll = () => setVis && setVis((v) => ({ ...v, ...Object.fromEntries(ids.map((id) => [id, false])) }));
   const onlyTop5 = () => {
     if (!setVis) return;
     const top = compareAtLevel(nivel, stats, ids).slice(0, 5).map((t) => t.spell.id);
@@ -76,28 +74,15 @@ export default function DamageChart({ stats, spells, nivel = 3, highlight = [], 
         <h2><TrendingUp size={20} /> Curvas de daño por nivel de espacio</h2>
         <div className="duel-controls">
           <button className="mini-btn" onClick={onlyTop5} title="Mostrar solo los 5 mejores a este nivel"><Crown size={13} /> Solo top 5</button>
-          <button className="mini-btn" onClick={showAll}><Eye size={13} /> Todos</button>
-          <button className="mini-btn" onClick={hideAll}><EyeOff size={13} /> Ninguno</button>
           <button className="swap" onClick={() => setExpand(true)}><Maximize2 size={15} /> Ampliar</button>
         </div>
       </div>
       <p className="muted small">
-        Misma selección que la tabla ({nVis} visibles). Los del duelo aparecen con línea gruesa.
+        Selección del menú común ({nVis} visibles). Los del duelo aparecen con línea gruesa.
+        {nVis > 14 ? ' Leyenda oculta: demasiadas líneas; usa Solo top 5 para comparar.' : ''}
       </p>
-      <div className="chips">
-        {list.map((s) => (
-          <button
-            key={s.id}
-            className={`chip ${visible[s.id] ? 'on' : ''}`}
-            style={{ '--c': s.color }}
-            onClick={() => toggle(s.id)}
-          >
-            <SpellIcon spell={s} size={13} /> {s.nombre}
-          </button>
-        ))}
-      </div>
       <div className="chart-box">
-        <ChartBody data={data} list={list} visible={visible} highlight={highlight} height={340} />
+        <ChartBody data={data} list={list} visible={visible} highlight={highlight} height={340} showLegend={nVis <= 14} />
       </div>
       {expand && (
         <div className="chart-modal" role="dialog" aria-label="Gráfica ampliada" onClick={() => setExpand(false)}>
@@ -106,7 +91,7 @@ export default function DamageChart({ stats, spells, nivel = 3, highlight = [], 
               <b>Curvas de daño por nivel de espacio</b>
               <button className="swap" onClick={() => setExpand(false)}><X size={15} /> Cerrar</button>
             </div>
-            <ChartBody data={data} list={list} visible={visible} highlight={highlight} height={Math.max(420, window.innerHeight * 0.7)} />
+            <ChartBody data={data} list={list} visible={visible} highlight={highlight} height={Math.max(420, window.innerHeight * 0.7)} showLegend={nVis <= 14} />
           </div>
         </div>
       )}

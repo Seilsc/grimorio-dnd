@@ -6,6 +6,7 @@ import Tabs from './components/Tabs.jsx';
 import WinnerBoard from './components/WinnerBoard.jsx';
 import DuelArena from './components/DuelArena.jsx';
 import CompareTable from './components/CompareTable.jsx';
+import VisMenu from './components/VisMenu.jsx';
 import DamageChart from './components/DamageChart.jsx';
 import SpellGrid from './components/SpellGrid.jsx';
 import { RES_DEFAULT } from './lib/damage.js';
@@ -13,8 +14,10 @@ import { SPELLS, spellsFor } from './data/spells.js';
 
 export default function App() {
   const [stats, setStats] = useState({
-    mod: 3, comp: 2, ca: 15, des: 2, con: 3, sab: 2, fue: 2, int: 0,
-    mel: 3, nivelPJ: 5, clase: 'todas', res: { ...RES_DEFAULT },
+    fue: 16, des: 14, con: 14, int: 16, sab: 12, car: 8,
+    nivelPJ: 4, clase: 'todas',
+    ca: 15, sDes: 2, sCon: 3, sSab: 2, sFue: 2, sInt: 0,
+    res: { ...RES_DEFAULT },
   });
   const [nivel, setNivel] = useState(3);
   const [aId, setAId] = useState('bola-fuego');
@@ -50,7 +53,8 @@ export default function App() {
         )}
         {tab === 'tabla' && (
           <>
-            <CompareTable stats={stats} spells={lista} vis={vis} setVis={setVis} />
+            <VisMenu list={lista} vis={vis} setVis={setVis} />
+            <CompareTable stats={stats} spells={lista} vis={vis} />
             <DamageChart
               stats={stats} spells={lista} nivel={nivel}
               highlight={[aId, bId]} vis={vis} setVis={setVis}

@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import {
-  Crown, Medal, Lightbulb, Copy, Check, Swords, Scale,
+  Crown, Medal, Lightbulb, Swords, Scale,
   ShieldAlert, Info, GitBranch,
 } from 'lucide-react';
 import {
   bestAndSecond, compareAtLevel, fmt, zeroRisk,
-  ruptureScan, activeRes, RES_MULT_LABEL, bonoAtaqueDe,
+  ruptureScan, bonoAtaqueDe,
 } from '../lib/damage.js';
-import { getSpell, RES_TYPES } from '../data/spells.js';
+import { getSpell } from '../data/spells.js';
 import SpellIcon from './SpellIcon.jsx';
 
 const WARNINGS = {
@@ -27,19 +27,12 @@ const WARNINGS = {
 
 const RUPTURE_VARS = [
   { key: 'ca', label: 'CA' },
-  { key: 'des', label: 'DES' },
-  { key: 'con', label: 'CON' },
-  { key: 'sab', label: 'SAB' },
-  { key: 'fue', label: 'FUE' },
-  { key: 'int', label: 'INT' },
+  { key: 'sDes', label: 'DES' },
+  { key: 'sCon', label: 'CON' },
+  { key: 'sSab', label: 'SAB' },
+  { key: 'sFue', label: 'FUE' },
+  { key: 'sInt', label: 'INT' },
 ];
-
-function resSummary(stats) {
-  const act = activeRes(stats);
-  if (!act.length) return '';
-  const label = (k) => RES_TYPES.find((t) => t.key === k)?.label ?? k;
-  return ` Resistencias: ${act.map((a) => `${label(a.key)} ${RES_MULT_LABEL[a.mult]}`).join(', ')}.`;
-}
 
 function explainBullets(best, second, stats) {
   const out = [];
@@ -51,7 +44,7 @@ function explainBullets(best, second, stats) {
   } else if (best.spell.tirada.startsWith('salv-')) {
     const sk = best.spell.tirada.slice(5).toLowerCase();
     const sn = { des: 'DES', con: 'CON', sab: 'SAB', fue: 'FUE', int: 'INT' }[sk] ?? sk.toUpperCase();
-    const sv = { des: stats.des, con: stats.con, sab: stats.sab ?? 2, fue: stats.fue ?? 2, int: stats.int ?? 0 }[sk] ?? 0;
+    const sv = { des: stats.sDes, con: stats.sCon, sab: stats.sSab ?? 2, fue: stats.sFue ?? 2, int: stats.sInt ?? 0 }[sk] ?? 0;
     out.push({ icon: Info, text: `El objetivo falla la salvación el ${(best.prob * 100).toFixed(0)}% de las veces (su ${sn} es ${sv > 0 ? `+${sv}` : sv}).` });
   } else {
     out.push({ icon: Info, text: `${best.spell.nombre} combina ataque y salvación (${best.probLabel}).` });
@@ -73,12 +66,25 @@ function explainBullets(best, second, stats) {
   return out;
 }
 
+// Consejo personalizado según quiénes son 1.º y 2.º.
+function tipAlternativa(best, second, stats) {
+  if (!second) return '';
+  if (best.spell.id === 'marchitar') return 'Si el objetivo es no-muerto o un constructo, Marchitar no le afecta: esta es tu opción.';
+  if (second.spell.id === 'proyectil-magico') return 'Nunca falla e ignora CA y salvaciones; pero un conjuro Escudo lo anula por completo.';
+  if (second.spell.id === 'desintegrar') return 'Todo o nada con el pico más alto: si el objetivo salva, hace 0.';
+  if (best.spell.tirada === 'ataque' && second.spell.tirada.startsWith('salv-')) return `Si su CA ${stats.ca} es inalcanzable, esta alternativa fuerza salvación en vez de ataque.`;
+  if (best.spell.tirada.startsWith('salv-') && second.spell.tirada === 'ataque') return `Si supera salvaciones con facilidad, esta alternativa ataca directamente su CA ${stats.ca}.`;
+  if (second.spell.tirada === 'auto') return 'Daño garantizado sin tiradas: no depende de la suerte.';
+  return 'Casi tanto daño como la mejor: guárdala por resistencias o inmunidades.';
+}
+
 function RuptureCard({ nivel, stats, defaultVar, ids }) {
   const [rvar, setRvar] = useState(defaultVar);
   const ranges = ruptureScan(rvar, nivel, stats, ids);
   const rmin = rvar === 'ca' ? 1 : -5;
   const rmax = rvar === 'ca' ? 39 : 19;
   const curVal = stats[rvar];
+  const rLabel = RUPTURE_VARS.find((v) => v.key === rvar)?.label ?? rvar;
   return (
     <div className="card rupture">
       <div className="rupture-head">
@@ -91,7 +97,7 @@ function RuptureCard({ nivel, stats, defaultVar, ids }) {
           ))}
         </div>
       </div>
-      <p className="muted small">Moviendo solo {rvar.toUpperCase()} (resto igual), el ganador a nivel {nivel} sería…</p>
+      <p className="muted small">Moviendo solo {rLabel} (resto igual), el ganador a nivel {nivel} sería…</p>
       <div className="rupture-bar">
         {ranges.map((r, i) => {
           const w = (r.to - r.from + 1) / (rmax - rmin + 1);
@@ -101,14 +107,14 @@ function RuptureCard({ nivel, stats, defaultVar, ids }) {
               key={i}
               className="rupture-seg"
               style={{ flexGrow: Math.max(1, Math.round(w * 100)), background: sp ? sp.color : '#9a8560' }}
-              title={sp ? `${rvar.toUpperCase()} ${r.from}–${r.to}: ${sp.nombre}` : `${rvar.toUpperCase()} ${r.from}–${r.to}: nadie`}
+                title={sp ? `${rLabel} ${r.from}–${r.to}: ${sp.nombre}` : `${rLabel} ${r.from}–${r.to}: nadie`}
             />
           );
         })}
         <div
           className="rupture-marker"
           style={{ left: `${((curVal - rmin) / (rmax - rmin)) * 100}%` }}
-          title={`Tu valor actual: ${rvar.toUpperCase()} ${curVal}`}
+            title={`Tu valor actual: ${rLabel} ${curVal}`}
         />
       </div>
       <ul className="rupture-list">
@@ -118,7 +124,7 @@ function RuptureCard({ nivel, stats, defaultVar, ids }) {
           return (
             <li key={i} className={here ? 'here' : ''}>
               {sp ? <SpellIcon spell={sp} size={15} /> : null}
-              <span>{rvar.toUpperCase()} {r.from}{r.from !== r.to ? `–${r.to}` : ''} → <b>{sp ? sp.nombre : 'nadie'}</b>{here ? ' (estás aquí)' : ''}</span>
+              <span>{rLabel} {r.from}{r.from !== r.to ? `–${r.to}` : ''} → <b>{sp ? sp.nombre : 'nadie'}</b>{here ? ' (estás aquí)' : ''}</span>
             </li>
           );
         })}
@@ -132,71 +138,19 @@ export default function WinnerBoard({ nivel, setNivel, stats, ids }) {
   const { best, second } = bestAndSecond(nivel, stats, ids);
   const top5 = compareAtLevel(nivel, stats, ids).slice(0, 5);
   const maxTop = top5[0]?.dmg || 1;
-  const [copied, setCopied] = useState(false);
-  const [copyText, setCopyText] = useState(null);
-
   const defaultVar = !best ? 'ca'
     : best.spell.tirada === 'ataque' ? 'ca'
-      : best.spell.tirada === 'salv-des' ? 'des'
-        : best.spell.tirada === 'salv-con' ? 'con'
-          : best.spell.tirada === 'salv-sab' ? 'sab'
-            : best.spell.tirada === 'salv-fue' ? 'fue'
-              : best.spell.tirada === 'salv-int' ? 'int' : 'ca';
-
-  const copyVerdict = async () => {
-    if (!best) return;
-    const sign = (v) => (v > 0 ? `+${v}` : `${v}`);
-    const lines = [
-      `Nivel ${nivel} vs CA ${stats.ca}, DES ${sign(stats.des)}, CON ${sign(stats.con)}, SAB ${sign(stats.sab ?? 2)}:${resSummary(stats)}`,
-      `1.º ${best.spell.nombre} ${fmt(best.dmg)} (${best.dados}, ${best.probLabel}).`,
-    ];
-    if (second) lines.push(`2.º ${second.spell.nombre} ${fmt(second.dmg)} (${second.dados}).`);
-    const text = lines.join(' ');
-    let ok = false;
-    try {
-      if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(text);
-        ok = true;
-      }
-    } catch { /* cae al método manual */ }
-    if (!ok) {
-      try {
-        const ta = document.createElement('textarea');
-        ta.value = text;
-        ta.style.position = 'fixed';
-        ta.style.opacity = '0';
-        document.body.appendChild(ta);
-        ta.focus();
-        ta.select();
-        ok = document.execCommand('copy');
-        document.body.removeChild(ta);
-      } catch { ok = false; }
-    }
-    if (ok) {
-      setCopyText(null);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
-    } else {
-      setCopyText(text); // el navegador lo bloquea: muestro el texto para copiar a mano
-    }
-  };
+      : best.spell.tirada === 'salv-des' ? 'sDes'
+        : best.spell.tirada === 'salv-con' ? 'sCon'
+          : best.spell.tirada === 'salv-sab' ? 'sSab'
+            : best.spell.tirada === 'salv-fue' ? 'sFue'
+              : best.spell.tirada === 'salv-int' ? 'sInt' : 'ca';
 
   return (
     <section className="panel" id="ganador">
       <div className="section-title">
         <h2><Crown size={20} /> Mejor hechizo para este objetivo</h2>
-        <button className="swap" onClick={copyVerdict} disabled={!best} title="Copiar el veredicto para el chat">
-          {copied ? <Check size={15} /> : <Copy size={15} />} {copied ? 'Copiado' : 'Copiar veredicto'}
-        </button>
       </div>
-
-      {copyText && (
-        <div className="card copy-box">
-          <p className="muted small">Tu navegador bloquea el copiado automático. Selecciona y copia el texto a mano:</p>
-          <textarea readOnly value={copyText} rows={3} onFocus={(e) => e.target.select()} />
-          <div><button className="swap" onClick={() => setCopyText(null)}>Cerrar</button></div>
-        </div>
-      )}
 
       {/* Podio completo 1-9 */}
       <div className="podium">
@@ -237,11 +191,14 @@ export default function WinnerBoard({ nivel, setNivel, stats, ids }) {
           <div className="second-head"><Medal size={16} /> 2.º mejor · alternativa</div>
           {second ? (
             <>
-              <div className="second-name"><SpellIcon spell={second.spell} size={16} /> {second.spell.nombre} — <b>{fmt(second.dmg)}</b></div>
+              <div className="second-name"><SpellIcon spell={second.spell} size={22} /> {second.spell.nombre}</div>
+              <div className="second-dmg">{fmt(second.dmg)}</div>
+              <div className="muted small">daño medio · {second.dados}</div>
+              <div className="muted small">{second.probLabel}</div>
               <div className="muted small">{second.spell.notas}</div>
+              <p className="muted small tip"><Lightbulb size={14} /> {tipAlternativa(best, second, stats)}</p>
             </>
           ) : <p className="muted">—</p>}
-          <p className="muted small tip"><Lightbulb size={14} /> Útil si el mejor no vale (p. ej. Marchitar vs no-muertos, Escudo vs Proyectil).</p>
         </div>
       </div>
 

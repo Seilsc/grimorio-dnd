@@ -1,9 +1,9 @@
-import { Table2, Crown, Eye, EyeOff } from 'lucide-react';
+import { Table2, Crown } from 'lucide-react';
 import { SPELLS } from '../data/spells.js';
 import { fullMatrix, bestAndSecond, fmt } from '../lib/damage.js';
 import SpellIcon from './SpellIcon.jsx';
 
-export default function CompareTable({ stats, spells, vis, setVis }) {
+export default function CompareTable({ stats, spells, vis }) {
   const list = spells ?? SPELLS;
   const ids = list.map((s) => s.id);
   const shownMap = vis ?? Object.fromEntries(ids.map((id) => [id, true]));
@@ -20,31 +20,11 @@ export default function CompareTable({ stats, spells, vis, setVis }) {
   }
 
   const shown = list.filter((s) => shownMap[s.id]);
-  const toggle = (id) => setVis && setVis((v) => ({ ...v, [id]: !v[id] }));
-  const showAll = () => setVis && setVis((v) => ({ ...v, ...Object.fromEntries(ids.map((id) => [id, true])) }));
-  const hideAll = () => setVis && setVis((v) => ({ ...v, ...Object.fromEntries(ids.map((id) => [id, false])) }));
 
   return (
     <section className="panel" id="tabla">
       <h2><Table2 size={20} /> Daño medio de cada hechizo contra este objetivo</h2>
       <p className="muted small">« – » = no se puede lanzar con ese espacio. La celda de lacre es la mejor de su columna. Los trucos no gastan espacio.</p>
-      <div className="chips chips-row">
-        {list.map((s) => (
-          <button
-            key={s.id}
-            className={`chip ${shownMap[s.id] ? 'on' : ''}`}
-            style={{ '--c': s.color }}
-            onClick={() => toggle(s.id)}
-            title={shownMap[s.id] ? `Ocultar ${s.nombre} (también en la gráfica)` : `Mostrar ${s.nombre} (también en la gráfica)`}
-          >
-            <SpellIcon spell={s} size={13} /> {s.nombre}
-          </button>
-        ))}
-        <span className="chips-actions">
-          <button className="mini-btn" onClick={showAll}><Eye size={13} /> Todos</button>
-          <button className="mini-btn" onClick={hideAll}><EyeOff size={13} /> Ninguno</button>
-        </span>
-      </div>
       <div className="table-wrap">
         <table className="compare">
           <thead>

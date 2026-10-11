@@ -1,6 +1,6 @@
 import { ArrowLeftRight, Crown, Scale } from 'lucide-react';
 import { SPELLS } from '../data/spells.js';
-import { duel, fmt } from '../lib/damage.js';
+import { attackBonus, spellDC, modLanz, compDe, duel, fmt } from '../lib/damage.js';
 import SpellIcon from './SpellIcon.jsx';
 
 function DuelCard({ R, side, isWinner, onPick, max }) {
@@ -37,6 +37,8 @@ function DuelCard({ R, side, isWinner, onPick, max }) {
 export default function DuelArena({ aId, bId, setAId, setBId, nivel, setNivel, stats }) {
   const { A, B, ganador, diff, pct } = duel(aId, bId, nivel, stats);
   const max = Math.max(A.dmg ?? 0, B.dmg ?? 0, 0.01);
+  const bonoD = attackBonus(modLanz(stats), compDe(stats));
+  const cdD = spellDC(modLanz(stats), compDe(stats));
 
   const swap = () => { setAId(bId); setBId(aId); };
 
@@ -68,7 +70,7 @@ export default function DuelArena({ aId, bId, setAId, setBId, nivel, setNivel, s
         <DuelCard R={B} side="B" isWinner={ganador === 'B'} onPick={setBId} max={max} />
       </div>
       <div className="card verdict">{verdict()}</div>
-      <p className="muted small">El duelo usa tus datos actuales (bono +{stats.mod + stats.comp}, CD {8 + stats.mod + stats.comp}, CA {stats.ca}, DES {stats.des}, CON {stats.con}). Cambia arriba y el duelo se recalcula.</p>
+      <p className="muted small">El duelo usa tus datos actuales (bono +{bonoD}, CD {cdD}, CA {stats.ca}). Cambia arriba y el duelo se recalcula.</p>
     </section>
   );
 }

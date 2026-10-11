@@ -4,12 +4,12 @@ import { Minus, Plus } from 'lucide-react';
  * Stepper propio: botones − / + con iconos + slider.
  * Sustituye al input number nativo (flechas feas del navegador).
  */
-export default function Stepper({ label, value, min, max, onChange, hint, plain = false }) {
+export default function Stepper({ label, value, min, max, onChange, hint, plain = false, slider = true }) {
   const clamp = (v) => Math.max(min, Math.min(max, v));
   const shown = !plain && value > 0 ? `+${value}` : `${value}`;
 
   return (
-    <div className="stepper">
+    <div className={`stepper ${slider ? '' : 'compact'}`}>
       <span className="stepper-label">{label}</span>
       <div className="stepper-row">
         <button
@@ -28,10 +28,12 @@ export default function Stepper({ label, value, min, max, onChange, hint, plain 
           <Plus size={16} />
         </button>
       </div>
-      <input
-        type="range" min={min} max={max} value={value} aria-label={label}
-        onChange={(e) => onChange(clamp(Number(e.target.value)))}
-      />
+      {slider && (
+        <input
+          type="range" min={min} max={max} value={value} aria-label={label}
+          onChange={(e) => onChange(clamp(Number(e.target.value)))}
+        />
+      )}
       {hint && <span className="field-hint">{hint}</span>}
     </div>
   );

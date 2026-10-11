@@ -18,14 +18,27 @@ const MAP = {
   Navigation, Eye, Maximize2, X, LayoutGrid,
 };
 
-/** Icono Lucide por nombre, teñido con el color dado. */
+/**
+ * Icono del hechizo dentro de un medallón que contrasta con el fondo:
+ * cuero oscuro sobre pergamino, velo claro sobre superficies oscuras (vía CSS).
+ */
 export default function SpellIcon({ spell, size = 18 }) {
   const C = MAP[spell.icon] ?? Flame;
-  return <C size={size} color={spell.color} strokeWidth={2.2} />;
+  const d = size + 10;
+  return (
+    <span className="sicon" style={{ '--sc': spell.color, width: d, height: d }}>
+      <C size={size} strokeWidth={2.4} />
+    </span>
+  );
 }
 
 /** Icono suelto por nombre (p. ej. resistencias). */
-export function ResIcon({ name, size = 15, color = '#8a6d2f' }) {
+export function ResIcon({ name, size = 15, color = '#e8cf7a' }) {
   const C = MAP[name] ?? Flame;
-  return <C size={size} color={color} strokeWidth={2.2} />;
+  const d = size + 10;
+  return (
+    <span className="sicon" style={{ '--sc': color, width: d, height: d }}>
+      <C size={size} strokeWidth={2.4} />
+    </span>
+  );
 }

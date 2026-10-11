@@ -8,9 +8,9 @@ const TABS = [
 ];
 
 const MODOS = [
+  { id: 'todos', label: 'Todos', icon: LayoutGrid },
   { id: 'hechizos', label: 'Hechizos', icon: WandSparkles },
   { id: 'mele', label: 'Melé', icon: Sword },
-  { id: 'todos', label: 'Todos', icon: LayoutGrid },
 ];
 
 export default function Tabs({ active, onChange, modo, onModo }) {
