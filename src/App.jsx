@@ -8,9 +8,10 @@ import DuelArena from './components/DuelArena.jsx';
 import CompareTable from './components/CompareTable.jsx';
 import DamageChart from './components/DamageChart.jsx';
 import SpellGrid from './components/SpellGrid.jsx';
+import { RES_DEFAULT } from './lib/damage.js';
 
 export default function App() {
-  const [stats, setStats] = useState({ mod: 3, comp: 2, ca: 15, des: 2, con: 3 });
+  const [stats, setStats] = useState({ mod: 3, comp: 2, ca: 15, des: 2, con: 3, res: { ...RES_DEFAULT } });
   const [nivel, setNivel] = useState(3);
   const [aId, setAId] = useState('bola-fuego');
   const [bId, setBId] = useState('proyectil-magico');

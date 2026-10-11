@@ -130,6 +130,24 @@ export const SPELLS = [
 
 export const getSpell = (id) => SPELLS.find((s) => s.id === id);
 
+// Tipos de daño configurables como resistencia del objetivo.
+export const RES_TYPES = [
+  { key: 'fuego', label: 'Fuego', icon: 'Flame' },
+  { key: 'frio', label: 'Frío', icon: 'Snowflake' },
+  { key: 'necrotico', label: 'Necrótico', icon: 'Skull' },
+  { key: 'fuerza', label: 'Fuerza', icon: 'Atom' },
+  { key: 'contundente', label: 'Contundente', icon: 'Hammer' },
+  { key: 'perforante', label: 'Perforante', icon: 'Axe' },
+  { key: 'radiante', label: 'Radiante', icon: 'Sun' },
+];
+
+export const RES_STATES = [
+  { v: 1, label: '×1', desc: 'Normal' },
+  { v: 0.5, label: '×½', desc: 'Resiste' },
+  { v: 0, label: '×0', desc: 'Inmune' },
+  { v: 2, label: '×2', desc: 'Vulnerable' },
+];
+
 export const TIRADA_COLORS = {
   'ataque': '#f87171',
   'salv-des': '#fb923c',

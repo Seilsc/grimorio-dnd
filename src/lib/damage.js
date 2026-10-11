@@ -18,6 +18,10 @@ const attackDmg = (nDados, caras, probHit) => nDados * avgDie(caras) * (probHit 
 const saveDmg = (nDados, caras, fijo, pFail, pSave, fraction) =>
   (nDados * avgDie(caras) + fijo) * (pFail + pSave * fraction);
 
+// Resistencias del objetivo: multiplicador por tipo de daño (1 normal, 0.5 resiste, 0 inmune, 2 vulnerable).
+// El Excel las ignora; la web las aplica encima del cálculo del Excel.
+export const RES_DEFAULT = { fuego: 1, frio: 1, necrotico: 1, fuerza: 1, contundente: 1, perforante: 1, radiante: 1 };
+
 export function dadosStr(spell, nivel) {
   if (nivel < spell.nivelMin || nivel > spell.nivelMax) return '–';
   switch (spell.id) {
@@ -48,12 +52,13 @@ export function dadosStr(spell, nivel) {
 }
 
 /**
- * stats = { mod, comp, ca, des, con }
+ * stats = { mod, comp, ca, des, con, res }
  * devuelve { dmg, lanzable, motivo, prob, probLabel, dados }
  */
 export function spellDamage(spellOrId, nivel, stats) {
   const spell = typeof spellOrId === 'string' ? getSpell(spellOrId) : spellOrId;
   const { mod, comp, ca, des, con } = stats;
+  const res = (k) => stats.res?.[k] ?? 1;
   const bono = attackBonus(mod, comp);
   const dc = spellDC(mod, comp);
 
@@ -74,42 +79,60 @@ export function spellDamage(spellOrId, nivel, stats) {
     case 'bola-fuego':
     case 'manos-ardientes': {
       const n = spell.dadosBase + (nivel - spell.nivelBase) * spell.extraPorNivel;
-      return { dmg: saveDmg(n, spell.caras, 0, fDes, pSdes, 0.5), lanzable: true, prob: fDes, probLabel: `${(fDes * 100).toFixed(0)}% fallo salv.`, dados: dadosStr(spell, nivel) };
+      const dmg = saveDmg(n, spell.caras, 0, fDes, pSdes, 0.5) * res('fuego');
+      return { dmg, lanzable: true, prob: fDes, probLabel: `${(fDes * 100).toFixed(0)}% fallo salv.`, dados: dadosStr(spell, nivel) };
     }
     case 'marchitar': {
       const n = spell.dadosBase + (nivel - spell.nivelBase) * spell.extraPorNivel;
-      return { dmg: saveDmg(n, spell.caras, 0, fCon, pScon, 0.5), lanzable: true, prob: fCon, probLabel: `${(fCon * 100).toFixed(0)}% fallo salv.`, dados: dadosStr(spell, nivel) };
+      const dmg = saveDmg(n, spell.caras, 0, fCon, pScon, 0.5) * res('necrotico');
+      return { dmg, lanzable: true, prob: fCon, probLabel: `${(fCon * 100).toFixed(0)}% fallo salv.`, dados: dadosStr(spell, nivel) };
     }
     case 'dedo-muerte': {
-      return { dmg: saveDmg(7, 8, 30, fCon, pScon, 0.5), lanzable: true, prob: fCon, probLabel: `${(fCon * 100).toFixed(0)}% fallo salv.`, dados: dadosStr(spell, nivel) };
+      const dmg = saveDmg(7, 8, 30, fCon, pScon, 0.5) * res('necrotico');
+      return { dmg, lanzable: true, prob: fCon, probLabel: `${(fCon * 100).toFixed(0)}% fallo salv.`, dados: dadosStr(spell, nivel) };
     }
     case 'desintegrar': {
       const n = spell.dadosBase + (nivel - spell.nivelBase) * spell.extraPorNivel;
-      return { dmg: saveDmg(n, spell.caras, spell.fijo, fDes, pSdes, 0), lanzable: true, prob: fDes, probLabel: `${(fDes * 100).toFixed(0)}% fallo salv. (0 si salva)`, dados: dadosStr(spell, nivel) };
+      const dmg = saveDmg(n, spell.caras, spell.fijo, fDes, pSdes, 0) * res('fuerza');
+      return { dmg, lanzable: true, prob: fDes, probLabel: `${(fDes * 100).toFixed(0)}% fallo salv. (0 si salva)`, dados: dadosStr(spell, nivel) };
     }
     case 'lluvia-meteoritos': {
-      return { dmg: saveDmg(40, 6, 0, fDes, pSdes, 0.5), lanzable: true, prob: fDes, probLabel: `${(fDes * 100).toFixed(0)}% fallo salv.`, dados: dadosStr(spell, nivel) };
+      const base = saveDmg(40, 6, 0, fDes, pSdes, 0.5);
+      const dmg = base * (0.5 * res('fuego') + 0.5 * res('contundente'));
+      return { dmg, lanzable: true, prob: fDes, probLabel: `${(fDes * 100).toFixed(0)}% fallo salv.`, dados: dadosStr(spell, nivel) };
     }
-    case 'causar-heridas':
-    case 'orbe-cromatico':
+    case 'causar-heridas': {
+      const n = spell.dadosBase + (nivel - spell.nivelBase) * spell.extraPorNivel;
+      const dmg = attackDmg(n, spell.caras, pH) * res('necrotico');
+      return { dmg, lanzable: true, prob: pH, probLabel: `${(pH * 100).toFixed(0)}% impacto (+5% crít.)`, dados: dadosStr(spell, nivel) };
+    }
+    case 'orbe-cromatico': {
+      const n = spell.dadosBase + (nivel - spell.nivelBase) * spell.extraPorNivel;
+      // tipo a elegir: se supone que eliges uno sin resistencia (×1)
+      const dmg = attackDmg(n, spell.caras, pH);
+      return { dmg, lanzable: true, prob: pH, probLabel: `${(pH * 100).toFixed(0)}% impacto (+5% crít.)`, dados: dadosStr(spell, nivel) };
+    }
     case 'virote-guia': {
       const n = spell.dadosBase + (nivel - spell.nivelBase) * spell.extraPorNivel;
-      return { dmg: attackDmg(n, spell.caras, pH), lanzable: true, prob: pH, probLabel: `${(pH * 100).toFixed(0)}% impacto (+5% crít.)`, dados: dadosStr(spell, nivel) };
+      const dmg = attackDmg(n, spell.caras, pH) * res('radiante');
+      return { dmg, lanzable: true, prob: pH, probLabel: `${(pH * 100).toFixed(0)}% impacto (+5% crít.)`, dados: dadosStr(spell, nivel) };
     }
     case 'rayo-abrasador': {
       const rays = spell.rayosBase + (nivel - spell.nivelBase) * spell.rayosExtra;
       const perRay = attackDmg(spell.dadosPorRayo, spell.caras, pH);
-      return { dmg: rays * perRay, lanzable: true, prob: pH, probLabel: `${(pH * 100).toFixed(0)}% por rayo ×${rays}`, dados: dadosStr(spell, nivel) };
+      const dmg = rays * perRay * res('fuego');
+      return { dmg, lanzable: true, prob: pH, probLabel: `${(pH * 100).toFixed(0)}% por rayo ×${rays}`, dados: dadosStr(spell, nivel) };
     }
     case 'proyectil-magico': {
       const darts = spell.dardosBase + (nivel - 1) * spell.dardosExtra;
-      return { dmg: darts * 3.5, lanzable: true, prob: 1, probLabel: '100% (nunca falla)', dados: dadosStr(spell, nivel) };
+      const dmg = darts * 3.5 * res('fuerza');
+      return { dmg, lanzable: true, prob: 1, probLabel: '100% (nunca falla)', dados: dadosStr(spell, nivel) };
     }
     case 'cuchillo-hielo': {
-      const atk = attackDmg(1, 10, pH);
+      const atk = attackDmg(1, 10, pH) * res('perforante');
       const nE = spell.explosion.dadosBase + (nivel - 1) * spell.explosion.extraPorNivel;
       const exploFull = nE * avgDie(spell.explosion.caras);
-      const explo = exploFull * fDes; // fracción 0: sin mitad
+      const explo = exploFull * fDes * res('frio'); // fracción 0: sin mitad
       return {
         dmg: atk + explo, lanzable: true, prob: pH,
         probLabel: `${(pH * 100).toFixed(0)}% ataque + ${(fDes * 100).toFixed(0)}% explo.`,
@@ -163,3 +186,74 @@ export function duel(aId, bId, nivel, stats) {
 }
 
 export const fmt = (v) => (v == null ? '–' : (Math.round(v * 10) / 10).toFixed(1));
+
+/**
+ * Probabilidad de hacer 0 de daño con ese hechizo y nivel (fiabilidad).
+ * Ataque simple: fallar el ataque. Rayo: fallar todos los rayos.
+ * Salvación con mitad: nunca 0. Todo-o-nada (Desintegrar, explosión): que salve.
+ * Cuchillo: fallar ataque Y que salve la explosión. Automático: 0.
+ */
+export function zeroRisk(spellOrId, nivel, stats) {
+  const spell = typeof spellOrId === 'string' ? getSpell(spellOrId) : spellOrId;
+  const { mod, comp, ca, des } = stats;
+  if (nivel < spell.nivelMin || nivel > spell.nivelMax) return null;
+  const bono = attackBonus(mod, comp);
+  const dc = spellDC(mod, comp);
+  const pH = pHit(ca, bono);
+  const pSdes = pSaveSuccess(dc, des);
+  switch (spell.id) {
+    case 'proyectil-magico':
+      return 0;
+    case 'bola-fuego':
+    case 'manos-ardientes':
+    case 'marchitar':
+    case 'dedo-muerte':
+    case 'lluvia-meteoritos':
+    case 'orbe-cromatico':
+      // mitad al salvar (orbe es ataque simple... se trata abajo)
+      if (spell.id === 'orbe-cromatico') return 1 - pH;
+      return 0;
+    case 'causar-heridas':
+    case 'virote-guia':
+      return 1 - pH;
+    case 'rayo-abrasador': {
+      const rays = spell.rayosBase + (nivel - spell.nivelBase) * spell.rayosExtra;
+      return Math.pow(1 - pH, rays);
+    }
+    case 'desintegrar':
+      return pSdes;
+    case 'cuchillo-hielo':
+      return (1 - pH) * pSdes;
+    default:
+      return null;
+  }
+}
+
+/**
+ * Punto de ruptura: recorre todo el rango de una variable del objetivo
+ * (ca 1–39, des/con −5–19) y comprime los tramos donde gana cada hechizo.
+ * Devuelve [{ id, from, to }].
+ */
+export function ruptureScan(varKey, nivel, stats) {
+  const min = varKey === 'ca' ? 1 : -5;
+  const max = varKey === 'ca' ? 39 : 19;
+  const out = [];
+  let cur = null;
+  for (let v = min; v <= max; v++) {
+    const b = bestAndSecond(nivel, { ...stats, [varKey]: v }).best;
+    const id = b ? b.spell.id : null;
+    if (!cur || cur.id !== id) { cur = { id, from: v, to: v }; out.push(cur); }
+    else cur.to = v;
+  }
+  return out;
+}
+
+/** Resistencias no normales, para avisos y veredicto. Devuelve [{key, mult}]. */
+export function activeRes(stats) {
+  const r = stats.res ?? {};
+  return Object.entries(RES_DEFAULT)
+    .filter(([k]) => (r[k] ?? 1) !== 1)
+    .map(([k]) => ({ key: k, mult: r[k] ?? 1 }));
+}
+
+export const RES_MULT_LABEL = { 0: '×0 inmune', 0.5: '×½ resiste', 1: '×1 normal', 2: '×2 vulnerable' };
