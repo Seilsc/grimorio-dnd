@@ -11,7 +11,6 @@ import DamageChart from './components/DamageChart.jsx';
 import SpellGrid from './components/SpellGrid.jsx';
 import { RES_DEFAULT } from './lib/damage.js';
 import { SPELLS, spellsFor } from './data/spells.js';
-
 export default function App() {
   const [stats, setStats] = useState({
     fue: 16, des: 14, con: 14, int: 16, sab: 12, car: 8,
@@ -27,8 +26,9 @@ export default function App() {
   const [vis, setVis] = useState(() => Object.fromEntries(SPELLS.map((s) => [s.id, true])));
 
   const setClase = (c) => setStats((s) => ({ ...s, clase: c }));
-  const lista = spellsFor(stats.clase, modo);
+  const lista = spellsFor(stats.clase, modo, stats.nivelPJ);
   const ids = lista.map((s) => s.id);
+  const ocultos = spellsFor(stats.clase, modo, null).length - lista.length;
 
   return (
     <div className="app">
@@ -43,7 +43,7 @@ export default function App() {
         <Tabs active={tab} onChange={setTab} modo={modo} onModo={setModo} />
 
         {tab === 'mejor' && (
-          <WinnerBoard nivel={nivel} setNivel={setNivel} stats={stats} ids={ids} />
+          <WinnerBoard nivel={nivel} setNivel={setNivel} stats={stats} ids={ids} ocultos={ocultos} />
         )}
         {tab === 'duelo' && (
           <DuelArena

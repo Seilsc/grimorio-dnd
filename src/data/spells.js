@@ -186,14 +186,47 @@ export const CLASES = [
 export const claseLabel = (key) => CLASES.find((c) => c.key === key)?.label ?? key;
 
 // modo: 'hechizos' (conjuros + trucos), 'mele' (armas y rasgos), 'todos'.
-export function spellsFor(clase, modo = 'todos') {
+export function spellsFor(clase, modo = 'todos', nivelPJ = null) {
   let base;
   if (!clase || clase === 'todas') base = SPELLS;
   else if (clase === 'caballero' || clase === 'picaro-arcano') base = SPELLS.filter((s) => s.clases.includes('mago'));
   else base = SPELLS.filter((s) => s.clases.includes(clase));
+  if (nivelPJ != null) base = base.filter((s) => usablePor(s, clase, nivelPJ));
   if (modo === 'mele') return base.filter((s) => s.cat === 'mele');
   if (modo === 'hechizos') return base.filter((s) => s.cat !== 'mele');
   return base;
+}
+
+// Nivel máximo de espacio de conjuro por clase y nivel de personaje (PHB + TCoE).
+// null = sin restricción (todas). 0 = sin espacios (no lanzadores).
+export function espacioMaximo(clase, nivelPJ) {
+  const n = nivelPJ ?? 4;
+  switch (clase) {
+    case 'bardo': case 'clerigo': case 'druida': case 'hechicero': case 'mago':
+      return Math.min(9, Math.ceil(n / 2));
+    case 'brujo': // magia de pacto (+ arcanos 6-9 desde nv. 11)
+      if (n >= 17) return 9; if (n >= 15) return 8; if (n >= 13) return 7; if (n >= 11) return 6;
+      if (n >= 9) return 5; if (n >= 7) return 4; if (n >= 5) return 3; if (n >= 3) return 2; return 1;
+    case 'paladin': case 'explorador':
+      if (n < 2) return 0; return Math.min(5, Math.floor((n - 1) / 4) + 1);
+    case 'artifice':
+      return Math.min(5, Math.floor((n - 1) / 4) + 1);
+    case 'caballero': case 'picaro-arcano': // lanzadores de un tercio
+      if (n < 3) return 0; if (n >= 19) return 4; if (n >= 13) return 3; if (n >= 7) return 2; return 1;
+    case 'barbaro': case 'guerrero': case 'monje': case 'picaro':
+      return 0;
+    default:
+      return null;
+  }
+}
+
+// ¿puede usar esta entrada con esa clase y nivel? Melé y trucos siempre;
+// los conjuros de nivel, solo si tiene espacio suficiente.
+export function usablePor(entry, clase, nivelPJ) {
+  if (!clase || clase === 'todas') return true;
+  if (entry.cat === 'mele' || entry.truco) return true;
+  const max = espacioMaximo(clase, nivelPJ);
+  return max != null && max > 0 && entry.nivelMin <= max;
 }
 
 // Clases y libro de los 12 hechizos originales del Excel.

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { User, Skull, Shield, ChevronDown, Target, ShieldHalf, SlidersHorizontal, Swords } from 'lucide-react';
 import { attackBonus, spellDC, modLanz, compDe, modDe, caracLanzDe, ataquesTurno, activeRes } from '../lib/damage.js';
-import { RES_TYPES, RES_STATES, CLASES } from '../data/spells.js';
+import { RES_TYPES, RES_STATES, CLASES, espacioMaximo } from '../data/spells.js';
 import { ResIcon } from './SpellIcon.jsx';
 import Stepper from './Stepper.jsx';
 
@@ -25,6 +25,7 @@ export default function InputPanel({ stats, setStats, clase, setClase }) {
   const golpes = ataquesTurno(clase, stats.nivelPJ);
   const nRes = activeRes(stats).length;
   const carac = caracLanzDe(stats).toUpperCase();
+  const esp = clase === 'todas' ? null : espacioMaximo(clase, stats.nivelPJ);
 
   return (
     <section className="inputs-wrap" id="datos">
@@ -64,7 +65,7 @@ export default function InputPanel({ stats, setStats, clase, setClase }) {
               <div><Target size={14} /> Ataque <b>+{bono}</b></div>
               <div><ShieldHalf size={14} /> CD <b>{dc}</b> <span className="muted small">({carac})</span></div>
               <div><Swords size={14} /> Melé <b>+{mel + comp}</b> · <b>{golpes}</b> golpe{golpes > 1 ? 's' : ''}</div>
-              <div className="muted small">Nv{stats.nivelPJ} · Comp +{comp}</div>
+              <div className="muted small">Nv{stats.nivelPJ} · Comp +{comp}{esp != null && (esp > 0 ? <> · Espacio <b>N{esp}</b></> : ' · Sin espacios')}</div>
             </div>
           </div>
           <div className="inputs-group">

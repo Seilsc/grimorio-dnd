@@ -7,7 +7,7 @@ import {
   bestAndSecond, compareAtLevel, fmt, zeroRisk,
   ruptureScan, bonoAtaqueDe,
 } from '../lib/damage.js';
-import { getSpell } from '../data/spells.js';
+import { getSpell, claseLabel, espacioMaximo } from '../data/spells.js';
 import SpellIcon from './SpellIcon.jsx';
 
 const WARNINGS = {
@@ -133,7 +133,7 @@ function RuptureCard({ nivel, stats, defaultVar, ids }) {
   );
 }
 
-export default function WinnerBoard({ nivel, setNivel, stats, ids }) {
+export default function WinnerBoard({ nivel, setNivel, stats, ids, ocultos = 0 }) {
   const levels = [1, 2, 3, 4, 5, 6, 7, 8, 9];
   const { best, second } = bestAndSecond(nivel, stats, ids);
   const top5 = compareAtLevel(nivel, stats, ids).slice(0, 5);
@@ -151,6 +151,13 @@ export default function WinnerBoard({ nivel, setNivel, stats, ids }) {
       <div className="section-title">
         <h2><Crown size={20} /> Mejor hechizo para este objetivo</h2>
       </div>
+      {ocultos > 0 && (
+        <p className="muted small">
+          Tu {claseLabel(stats.clase)} de nv. {stats.nivelPJ} {espacioMaximo(stats.clase, stats.nivelPJ) > 0
+            ? <>solo llega a espacios de N{espacioMaximo(stats.clase, stats.nivelPJ)}</>
+            : 'no tiene espacios de conjuro'}: {ocultos} opcion{ocultos > 1 ? 'es' : ''} oculta{ocultos > 1 ? 's' : ''}. Sube de nivel para ver más.
+        </p>
+      )}
 
       {/* Podio completo 1-9 */}
       <div className="podium">
