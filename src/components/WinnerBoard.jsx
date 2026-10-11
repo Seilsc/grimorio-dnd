@@ -9,6 +9,7 @@ import {
 } from '../lib/damage.js';
 import { getSpell, claseLabel, espacioMaximo } from '../data/spells.js';
 import SpellIcon from './SpellIcon.jsx';
+import SpellLink from './SpellLink.jsx';
 
 const WARNINGS = {
   'proyectil-magico': 'El conjuro Escudo lo anula por completo.',
@@ -187,7 +188,7 @@ export default function WinnerBoard({ nivel, setNivel, stats, ids, ocultos = 0 }
           <div className="winner-crown"><Crown size={18} /> Nivel {nivel}</div>
           {best ? (
             <>
-              <div className="winner-name"><SpellIcon spell={best.spell} size={26} /> {best.spell.nombre}</div>
+              <div className="winner-name"><SpellIcon spell={best.spell} size={26} /> <SpellLink entry={best.spell}>{best.spell.nombre}</SpellLink></div>
               <div className="winner-dmg">{fmt(best.dmg)}</div>
               <div className="muted">daño medio esperado · {best.dados}</div>
               <div className="muted small">{best.probLabel}</div>
@@ -198,7 +199,7 @@ export default function WinnerBoard({ nivel, setNivel, stats, ids, ocultos = 0 }
           <div className="second-head"><Medal size={16} /> 2.º mejor · alternativa</div>
           {second ? (
             <>
-              <div className="second-name"><SpellIcon spell={second.spell} size={22} /> {second.spell.nombre}</div>
+              <div className="second-name"><SpellIcon spell={second.spell} size={22} /> <SpellLink entry={second.spell}>{second.spell.nombre}</SpellLink></div>
               <div className="second-dmg">{fmt(second.dmg)}</div>
               <div className="muted small">daño medio · {second.dados}</div>
               <div className="muted small">{second.probLabel}</div>
@@ -220,7 +221,7 @@ export default function WinnerBoard({ nivel, setNivel, stats, ids, ocultos = 0 }
               <div key={t.spell.id} className="top5-row">
                 <span className="top5-pos">{i + 1}.</span>
                 <SpellIcon spell={t.spell} size={17} />
-                <span className="top5-name">{t.spell.nombre}</span>
+                <span className="top5-name"><SpellLink entry={t.spell}>{t.spell.nombre}</SpellLink></span>
                 <div className="top5-bar"><div className="top5-fill" style={{ width: `${(t.dmg / maxTop) * 100}%` }} /></div>
                 <span className="top5-dmg">{fmt(t.dmg)}</span>
                 <span className="top5-diff muted small">{i === 0 ? 'mejor' : `−${fmt(diff)}`}</span>

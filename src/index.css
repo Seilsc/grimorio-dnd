@@ -288,6 +288,20 @@ code {
 /* Selector de clase */
 .class-label { display: grid; gap: 5px; font-size: 14px; font-weight: 700; color: var(--ink); margin: 8px 0 4px; }
 
+/* Enlaces a la ficha oficial (D&D Beyond) */
+.spell-link {
+  color: inherit;
+  text-decoration: none;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.spell-link:hover { text-decoration: underline dotted; text-underline-offset: 3px; }
+.spell-link .ext { opacity: 0.4; flex: none; }
+.spell-link:hover .ext { opacity: 1; }
+.spell-link.dnd-link {
+  font-size: 13px; font-weight: 700; font-family: 'Alegreya', serif;
+  color: #1f6a7a; margin-top: 6px;
+}
+
 /* Menú único de selección (tabla + gráfica) */
 .vis-menu { margin: 4px 2px 0; }
 .vis-head {

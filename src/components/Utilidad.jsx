@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Compass, Search } from 'lucide-react';
 import { UTILS, claseLabel } from '../data/spells.js';
 import SpellIcon from './SpellIcon.jsx';
+import SpellLink from './SpellLink.jsx';
 
 const TAGS = ['control', 'movimiento', 'exploración', 'social', 'información', 'defensa', 'sigilo', 'invocación', 'supervivencia'];
 
@@ -52,7 +53,7 @@ export default function Utilidad({ stats }) {
             <div className="spell-head">
               <span className="spell-icon"><SpellIcon spell={{ ...u, color: '#e8cf7a', icon: u.icon }} size={26} /></span>
               <div>
-                <h3>{u.nombre}</h3>
+                <h3><SpellLink entry={u}>{u.nombre}</SpellLink></h3>
                 <div className="spell-badges">
                   <span className="badge">{u.nivel === 0 ? 'Truco' : `Nv ${u.nivel}`}</span>
                   <span className="badge lvl">{u.libro}</span>

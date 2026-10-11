@@ -229,6 +229,114 @@ export function usablePor(entry, clase, nivelPJ) {
   return max != null && max > 0 && entry.nivelMin <= max;
 }
 
+// Slugs oficiales en inglés (D&D Beyond, sitio oficial de D&D).
+export const DDB_SPELL = {
+  'bola-fuego': 'fireball', 'causar-heridas': 'inflict-wounds', 'cuchillo-hielo': 'ice-knife',
+  'dedo-muerte': 'finger-of-death', 'desintegrar': 'disintegrate', 'lluvia-meteoritos': 'meteor-swarm',
+  'manos-ardientes': 'burning-hands', 'marchitar': 'blight', 'orbe-cromatico': 'chromatic-orb',
+  'proyectil-magico': 'magic-missile', 'rayo-abrasador': 'scorching-ray', 'virote-guia': 'guiding-bolt',
+  'ola-trueno': 'thunderwave', 'reprension-infernal': 'hellish-rebuke', 'catapulta': 'catapult',
+  'rayo-caos': 'chaos-bolt', 'susurros-disonantes': 'dissonant-whispers', 'fragmentar': 'shatter',
+  'nube-dagas': 'cloud-of-daggers', 'esfera-llameante': 'flaming-sphere', 'rayo-lunar': 'moonbeam',
+  'calentar-metal': 'heat-metal', 'arma-espiritual': 'spiritual-weapon', 'aganazzar': 'aganazzars-scorcher',
+  'granizo-snilloc': 'snillocs-snowball-swarm', 'diablo-polvo': 'dust-devil', 'relampago': 'lightning-bolt',
+  'tierra-erupcion': 'erupting-earth', 'toque-vampirico': 'vampiric-touch', 'guardianes-espirituales': 'spirit-guardians',
+  'llamar-relampago': 'call-lightning', 'paso-trueno': 'thunder-step', 'tormenta-hielo': 'ice-storm',
+  'esfera-vitriolica': 'vitriolic-sphere', 'muro-fuego': 'wall-of-fire', 'cono-frio': 'cone-of-cold',
+  'nube-asesina': 'cloudkill', 'plaga-insectos': 'insect-plague', 'energia-negativa': 'negative-energy-flood',
+  'ola-destructiva': 'destructive-wave', 'descarga-conjunta': 'conjure-volley', 'cadena-relampagos': 'chain-lightning',
+  'rayo-solar': 'sunbeam', 'esfera-congelacion': 'otilukes-freezing-sphere', 'barrera-cuchillas': 'blade-barrier',
+  'dano': 'harm', 'tormenta-fuego': 'fire-storm', 'bola-fuego-retardada': 'delayed-blast-fireball',
+  'explosion-solar': 'sunburst', 'nube-incendiaria': 'incendiary-cloud', 'marchitamiento-horrible': 'abi-dalzims-horrid-wilting',
+  'circulo-muerte': 'circle-of-death', 'rociada-prismatica': 'prismatic-spray', 'grito-psiquico': 'psychic-scream',
+  'guardian-fe': 'guardian-of-faith',
+  't-descarga-fuego': 'fire-bolt', 't-descarga-sobrenatural': 'eldritch-blast', 't-rayo-escarcha': 'ray-of-frost',
+  't-toque-helado': 'chill-touch', 't-agarre-electrico': 'shocking-grasp', 't-rociada-veneno': 'poison-spray',
+  't-salpicadura-acida': 'acid-splash', 't-llama-sagrada': 'sacred-flame', 't-toque-muerte': 'toll-the-dead',
+  't-palabra-resplandor': 'word-of-radiance', 't-burla-cruel': 'vicious-mockery', 't-latigo-espinas': 'thorn-whip',
+  't-producir-llama': 'produce-flame', 't-hoguera': 'create-bonfire', 't-mordisco-escarcha': 'frostbite',
+  't-trueno': 'thunderclap', 't-explosion-espadas': 'sword-burst', 't-atraccion-relampago': 'lightning-lure',
+  't-aguijon-mental': 'mind-sliver', 't-salvajismo-primigenio': 'primal-savagery', 't-infestacion': 'infestation',
+  'castigo-divino': 'divine-smite', 'm-marca-cazador': 'hunters-mark', 'm-maleficio': 'hex',
+  'c-curar-heridas': 'cure-wounds', 'c-palabra-curativa': 'healing-word', 'c-bayas': 'goodberry',
+  'c-ayuda': 'aid', 'c-plegaria': 'prayer-of-healing', 'c-palabra-masa': 'mass-healing-word',
+  'c-aura-vitalidad': 'aura-of-vitality', 'c-transferencia': 'life-transference', 'c-espiritu': 'healing-spirit',
+  'c-curar-masa': 'mass-cure-wounds', 'c-festin': 'heroes-feast', 'c-curar6': 'heal',
+  'c-regenerar': 'regenerate', 'c-curar-masa9': 'mass-heal', 'c-palabra-cura': 'power-word-heal',
+  'c-auxilio': 'spare-the-dying',
+  'u-orientacion': 'guidance', 'u-reparar': 'mending', 'u-mensaje': 'message',
+  'u-ilusion-menor': 'minor-illusion', 'u-prestidigitacion': 'prestidigitation', 'u-taumaturgia': 'thaumaturgy',
+  'u-luces': 'dancing-lights', 'u-druidismo': 'druidcraft', 'u-moldear-tierra': 'mold-earth',
+  'u-forma-agua': 'shape-water', 'u-control-llamas': 'control-flames', 'u-rafaga': 'gust',
+  'u-comprender': 'comprehend-languages', 'u-detectar-magia': 'detect-magic', 'u-identificar': 'identify',
+  'u-dormir': 'sleep', 'u-hechizar': 'charm-person', 'u-caida-pluma': 'feather-fall',
+  'u-salto': 'jump', 'u-zancada': 'longstrider', 'u-escudo': 'shield',
+  'u-proteccion': 'protection-from-evil-and-good', 'u-sirviente': 'unseen-servant', 'u-disfraz': 'disguise-self',
+  'u-hablar-animales': 'speak-with-animals', 'u-santuario': 'sanctuary', 'u-niebla': 'fog-cloud',
+  'u-retirada': 'expeditious-retreat', 'u-enmarañar': 'entangle', 'u-invisibilidad': 'invisibility',
+  'u-paso-brumoso': 'misty-step', 'u-apertura': 'knock', 'u-telaraña': 'web',
+  'u-sugestion': 'suggestion', 'u-inmovilizar': 'hold-person', 'u-ver-invisible': 'see-invisibility',
+  'u-desdibujarse': 'blur', 'u-imagen-multiple': 'mirror-image', 'u-paso-rastro': 'pass-without-trace',
+  'u-localizar-objeto': 'locate-object', 'u-localizar-naturaleza': 'locate-animals-or-plants',
+  'u-agrandar': 'enlarge-reduce', 'u-cerradura': 'arcane-lock', 'u-silencio': 'silence',
+  'u-oscuridad': 'darkness', 'u-levitar': 'levitate', 'u-volar': 'fly',
+  'u-disipar': 'dispel-magic', 'u-contrahechizo': 'counterspell', 'u-intermitencia': 'blink',
+  'u-prisa': 'haste', 'u-lentitud': 'slow', 'u-miedo': 'fear',
+  'u-patron': 'hypnotic-pattern', 'u-hablar-muertos': 'speak-with-dead', 'u-lenguas': 'tongues',
+  'u-respirar-agua': 'water-breathing', 'u-caminar-aguas': 'water-walk', 'u-circulo': 'magic-circle',
+  'u-no-deteccion': 'nondetection', 'u-enviar': 'sending', 'u-hablar-plantas': 'speak-with-plants',
+  'u-crecimiento': 'plant-growth', 'u-proteccion-energia': 'protection-from-energy', 'u-remover-maldicion': 'remove-curse',
+  'u-clarividencia': 'clairvoyance', 'u-siesta': 'catnap', 'u-comida': 'create-food-and-water',
+  'u-cabaña': 'leomunds-tiny-hut', 'u-cuerda': 'rope-trick', 'u-polimorfar': 'polymorph',
+  'u-destierro': 'banishment', 'u-invisibilidad-mayor': 'greater-invisibility', 'u-puerta-dimensional': 'dimension-door',
+  'u-ojo-arcano': 'arcane-eye', 'u-adivinacion': 'divination', 'u-localizar-criatura': 'locate-creature',
+  'u-control-agua': 'control-water', 'u-confusion': 'confusion', 'u-dominar-bestia': 'dominate-beast',
+  'u-mover-tierra': 'move-earth', 'u-piel-piedra': 'stoneskin', 'u-terreno': 'hallucinatory-terrain',
+  'u-cofre': 'leomunds-secret-chest', 'u-dominar-persona': 'dominate-person', 'u-telequinesis': 'telekinesis',
+  'u-muro-fuerza': 'wall-of-force', 'u-escudriñar': 'scrying', 'u-contactar': 'contact-other-plane',
+  'u-atadura': 'planar-binding', 'u-despertar': 'awaken', 'u-comunion': 'commune',
+  'u-inmovilizar-monstruo': 'hold-monster', 'u-apariencia': 'seeming', 'u-memoria': 'modify-memory',
+  'u-circulo-teletransporte': 'teleportation-circle', 'u-zancada-arborea': 'tree-stride', 'u-muro-piedra': 'wall-of-stone',
+  'u-geas': 'geas', 'u-saber': 'legend-lore', 'u-pasamuros': 'passwall',
+  'u-globo': 'globe-of-invulnerability', 'u-vision': 'true-seeing', 'u-ilusion-programada': 'programmed-illusion',
+  'u-recipiente': 'magic-jar', 'u-caminar-viento': 'wind-walk', 'u-transporte-plantas': 'transport-via-plants',
+  'u-contingencia': 'contingency', 'u-encontrar-senda': 'find-the-path', 'u-teletransporte': 'teleport',
+  'u-cambiar-plano': 'plane-shift', 'u-jaula': 'forcecage', 'u-simulacro': 'simulacrum',
+  'u-palabra-divina': 'divine-word', 'u-espejismo': 'mirage-arcane', 'u-reclusion': 'sequester',
+  'u-dominar-monstruo': 'dominate-monster', 'u-antimagia': 'antimagic-field', 'u-laberinto': 'maze',
+  'u-control-clima': 'control-weather', 'u-clon': 'clone', 'u-facilidad': 'glibness',
+  'u-debilidad': 'feeblemind', 'u-palabra-aturdir': 'power-word-stun', 'u-deseo': 'wish',
+  'u-parar-tiempo': 'time-stop', 'u-cambio-forma': 'shapechange', 'u-polimorfismo-verdadero': 'true-polymorph',
+  'u-pronostico': 'foresight', 'u-puerta': 'gate', 'u-invulnerabilidad': 'invulnerability',
+  'u-palabra-matar': 'power-word-kill', 'u-muro-prismatico': 'prismatic-wall',
+};
+
+export const DDB_EQUIP = {
+  'm-daga': 'dagger', 'm-espada-corta': 'shortsword', 'm-cimitarra': 'scimitar', 'm-maza': 'mace',
+  'm-lanza': 'spear', 'm-estoque': 'rapier', 'm-espada-larga': 'longsword', 'm-hacha-batalla': 'battleaxe',
+  'm-martillo-guerra': 'warhammer', 'm-mandoble': 'greatsword', 'm-hacha-dos-manos': 'greataxe',
+  'm-alabarda': 'halberd', 'm-maza-pesada': 'morningstar', 'm-tridente': 'trident', 'm-latigo': 'whip',
+  'm-garrote': 'club', 'm-jabalina': 'javelin', 'm-hoz': 'sickle', 'm-hacha-mano': 'handaxe',
+  'm-martillo-ligero': 'light-hammer',
+};
+
+export const DDB_SEARCH = {
+  'm-punetazo': 'unarmed strike', 'm-artes-marciales': 'martial arts', 'm-ataque-furtivo': 'sneak attack',
+  'm-golpe-divino': 'divine strike', 'm-floreo': 'blade flourish',
+  'c-imposicion': 'lay on hands', 'c-luz-curativa': 'healing light',
+  'u-ceguera': 'blindness deafness',
+};
+
+// URL oficial (D&D Beyond) de cualquier entrada: conjuro, equipo o búsqueda.
+export function dndUrl(entry) {
+  if (!entry) return 'https://www.dndbeyond.com/spells';
+  const id = typeof entry === 'string' ? entry : entry.id;
+  if (DDB_SPELL[id]) return `https://www.dndbeyond.com/spells/${DDB_SPELL[id]}`;
+  if (DDB_EQUIP[id]) return `https://www.dndbeyond.com/equipment/${DDB_EQUIP[id]}`;
+  const q = DDB_SEARCH[id] || (typeof entry === 'object' && entry.nombre) || id;
+  return `https://www.dndbeyond.com/search?q=${encodeURIComponent(q)}`;
+}
+
 // Clases y libro de los 12 hechizos originales del Excel.
 const LEGACY_META = {
   'bola-fuego': { clases: ['hechicero', 'mago'], libro: 'PHB' },
@@ -310,7 +418,7 @@ SPELLS.push(...SPELLS_EXTRA);
 // atracción... no: solo quedan fuera los de FUE/INT, que sí entran (ver abajo).
 export const CANTRIPS = [
   { id: 't-descarga-fuego', nombre: 'Descarga de fuego', icon: 'Flame', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, truco: true, mech: 'atk', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'fuego', color: '#f97316', caras: 10, clases: ['hechicero', 'mago'], libro: 'PHB', notas: 'Truco: escala con tu nivel (2 dados a nv. 5).' },
-  { id: 't-explosion-sobrenatural', nombre: 'Explosión sobrenatural', icon: 'Zap', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, truco: true, mech: 'atk', haces: true, tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'fuerza', color: '#60a5fa', caras: 10, clases: ['brujo'], libro: 'PHB', notas: 'Un rayo por haz (2 haces a nv. 5); cada uno tira ataque.' },
+  { id: 't-descarga-sobrenatural', nombre: 'Descarga sobrenatural', icon: 'Zap', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, truco: true, mech: 'atk', haces: true, tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'fuerza', color: '#60a5fa', caras: 10, clases: ['brujo'], libro: 'PHB', notas: 'Un rayo por haz (2 haces a nv. 5); cada uno tira ataque.' },
   { id: 't-rayo-escarcha', nombre: 'Rayo de escarcha', icon: 'Snowflake', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, truco: true, mech: 'atk', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'frío', color: '#38bdf8', caras: 8, clases: ['artifice', 'hechicero', 'mago'], libro: 'PHB', notas: 'Ralentiza 3 m hasta tu próximo turno.' },
   { id: 't-toque-helado', nombre: 'Toque helado', icon: 'Ghost', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, truco: true, mech: 'atk', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'necrótico', color: '#a855f7', caras: 8, clases: ['hechicero', 'brujo', 'mago'], libro: 'PHB', notas: 'Impide recuperar puntos de golpe un asalto.' },
   { id: 't-agarre-electrico', nombre: 'Agarre eléctrico', icon: 'PlugZap', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, truco: true, mech: 'atk', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'relámpago', color: '#7dd3fc', caras: 8, clases: ['artifice', 'hechicero', 'mago'], libro: 'PHB', notas: 'Ventaja contra metal; le quita la reacción.' },
@@ -359,8 +467,7 @@ export const MELEE = [
   { id: 'm-golpe-divino', nombre: 'Golpe divino', icon: 'Shield', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, cat: 'mele', mech: 'atk', atkStat: 'mel', golpes: 'uno', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'radiante', color: '#facc15', dadosPJ: (lvl) => [{ n: lvl >= 14 ? 2 : 1, c: 8, r: 'radiante' }], step: [], clases: ['clerigo'], libro: 'PHB', notas: 'Una vez por turno al impactar con arma. Sin contar el arma.' },
   { id: 'm-marca-cazador', nombre: 'Marca del cazador', icon: 'Target', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, mech: 'atk', atkStat: 'mel', golpes: 'turno', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'del arma', color: '#b08968', base: [{ n: 1, c: 6 }], step: [], clases: ['explorador'], libro: 'PHB', notas: '+1d6 por cada golpe que impacte. Concentración.' },
   { id: 'm-maleficio', nombre: 'Maleficio', icon: 'Moon', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, mech: 'atk', atkStat: 'mod', golpes: 'haces', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'necrótico', color: '#a855f7', base: [{ n: 1, c: 6, r: 'necrotico' }], step: [], clases: ['brujo'], libro: 'PHB', notas: 'Supone tus ataques de Explosión sobrenatural (1d6 por haz que impacte). Concentración.' },
-  { id: 'm-castigo-sobrenatural', nombre: 'Castigo sobrenatural', icon: 'Ghost', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, cat: 'mele', mech: 'atk', atkStat: 'mel', golpes: 'uno', tope: 5, tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'fuerza', color: '#60a5fa', base: [{ n: 1, c: 8, r: 'fuerza' }], step: [{ n: 1, c: 8, r: 'fuerza' }], clases: ['brujo'], libro: 'XGtE', notas: 'Con arma de pacto; derriba si es Enorme o menor. Sin contar el arma.' },
-  { id: 'm-floreo', nombre: 'Floreo de duelo', icon: 'Music', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, cat: 'mele', mech: 'atk', atkStat: 'mel', golpes: 'uno', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'del arma', color: '#b08968', dadosPJ: (lvl) => [{ n: 1, c: lvl >= 15 ? 12 : lvl >= 10 ? 10 : lvl >= 5 ? 8 : 6 }], step: [], clases: ['bardo'], libro: 'XGtE', notas: 'Gasta un dado de Inspiración al impactar. Sin contar el arma.' },
+  { id: 'm-floreo', nombre: 'Floreo de duelo', icon: 'Music', nivelMin: 1, nivelMax: 9, nivelBase: 1, generic: true, cat: 'mele', mech: 'atk', atkStat: 'mel', golpes: 'uno', tirada: 'ataque', tiradaLabel: 'Ataque (CA)', tipoDano: 'del arma', color: '#b08968', dadosPJ: (lvl) => [{ n: 1, c: lvl >= 15 ? 12 : lvl >= 10 ? 10 : lvl >= 5 ? 8 : 6 }], step: [], clases: ['bardo'], libro: 'XGtE', notas: 'Rasgo de bardo del Colegio de las Espadas: al impactar con un arma gastas un dado de Inspiración, lo sumas al daño y añades un efecto (defensa, huida o daño a otro).' },
 ];
 
 SPELLS.push(...MELEE);

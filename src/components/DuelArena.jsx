@@ -2,6 +2,7 @@ import { ArrowLeftRight, Crown, Scale } from 'lucide-react';
 import { SPELLS } from '../data/spells.js';
 import { attackBonus, spellDC, modLanz, compDe, duel, fmt } from '../lib/damage.js';
 import SpellIcon from './SpellIcon.jsx';
+import SpellLink from './SpellLink.jsx';
 
 function DuelCard({ R, side, isWinner, onPick, max }) {
   return (
@@ -30,6 +31,7 @@ function DuelCard({ R, side, isWinner, onPick, max }) {
         </>
       )}
       <p className="muted small">{R.spell.notas}</p>
+      <SpellLink entry={R.spell} className="dnd-link">Ficha oficial en D&D Beyond</SpellLink>
     </div>
   );
 }

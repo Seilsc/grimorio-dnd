@@ -9,6 +9,7 @@ import {
 import { CURAS, claseLabel } from '../data/spells.js';
 import { curaDe, fmt, modLanz, caracLanzDe } from '../lib/damage.js';
 import SpellIcon from './SpellIcon.jsx';
+import SpellLink from './SpellLink.jsx';
 import Tabs from './Tabs.jsx';
 import { Crown as CrownIcon, Swords as SwordsIcon, Table2 as Table2Icon, BookOpen as BookOpenIcon } from 'lucide-react';
 
@@ -82,6 +83,7 @@ function CuraDuelCard({ R, spec, side, isWinner, onPick, max, opciones }) {
         </>
       )}
       <p className="muted small">{spec.notas}</p>
+      <SpellLink entry={spec} className="dnd-link">Ficha oficial en D&D Beyond</SpellLink>
     </div>
   );
 }
@@ -333,7 +335,7 @@ export default function Curacion({ stats }) {
               <div className="spell-head">
                 <span className="spell-icon"><SpellIcon spell={{ ...c, color: '#4ade80', icon: c.icon }} size={30} /></span>
                 <div>
-                  <h3>{c.nombre}</h3>
+                  <h3><SpellLink entry={c}>{c.nombre}</SpellLink></h3>
                   <div className="spell-badges">
                     <span className="badge">Nv {c.min}{c.min !== c.max ? `–${c.max}` : ''}</span>
                     <span className="badge lvl">{c.libro}</span>

@@ -3,6 +3,7 @@ import { BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
 import { SPELLS, claseLabel } from '../data/spells.js';
 import { spellDamage, fmt } from '../lib/damage.js';
 import SpellIcon from './SpellIcon.jsx';
+import SpellLink from './SpellLink.jsx';
 
 const FILTROS = [
   { id: 'todos', label: 'Todos' },
@@ -49,7 +50,7 @@ export default function SpellGrid({ stats, nivel, spells }) {
               <div className="spell-head">
                 <span className="spell-icon"><SpellIcon spell={s} size={30} /></span>
                 <div>
-                  <h3>{s.nombre}</h3>
+                  <h3><SpellLink entry={s}>{s.nombre}</SpellLink></h3>
                   <div className="spell-badges">
                     <span className="badge">{s.tiradaLabel}</span>
                     <span className="badge dmg" style={{ '--c': s.color }}>{s.tipoDano}</span>

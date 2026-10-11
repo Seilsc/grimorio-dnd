@@ -2,6 +2,7 @@ import { Table2, Crown } from 'lucide-react';
 import { SPELLS } from '../data/spells.js';
 import { fullMatrix, bestAndSecond, fmt } from '../lib/damage.js';
 import SpellIcon from './SpellIcon.jsx';
+import SpellLink from './SpellLink.jsx';
 
 export default function CompareTable({ stats, spells, vis }) {
   const list = spells ?? SPELLS;
@@ -41,7 +42,7 @@ export default function CompareTable({ stats, spells, vis }) {
             {shown.map((s) => (
               <tr key={s.id}>
                 <td className="sticky">
-                  <span className="cell-name"><SpellIcon spell={s} size={15} /> {s.nombre}</span>
+                  <span className="cell-name"><SpellIcon spell={s} size={15} /> <SpellLink entry={s}>{s.nombre}</SpellLink></span>
                   <span className="cell-sub">{s.tipoDano} · Nv {s.nivelMin}{s.nivelMin !== s.nivelMax ? `–${s.nivelMax}` : ''}</span>
                 </td>
                 <td><span className="badge">{s.tiradaLabel}</span></td>
