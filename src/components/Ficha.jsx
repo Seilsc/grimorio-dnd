@@ -21,6 +21,8 @@ export default function Ficha({ entry, subtitulo }) {
           <dl>
             <div><dt>Libro</dt><dd><BookLink libro={entry.libro} /></dd></div>
             {subtitulo && <div><dt>Nivel</dt><dd>{subtitulo}</dd></div>}
+            {f.e && <div><dt>Escuela</dt><dd>{f.e}</dd></div>}
+            {f.o && <div><dt>Nombre oficial</dt><dd>{f.o}</dd></div>}
             {tirada && <div><dt>Tirada</dt><dd>{tirada}</dd></div>}
             {dano && <div><dt>Daño</dt><dd>{dano}</dd></div>}
             {f && (
