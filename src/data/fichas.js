@@ -1,7 +1,7 @@
 // Fichas completas por id: tiempo, alcance, componentes, duración + resumen y descripción.
 // a: pies (número) | 'T' toque | 'P' personal | texto libre. Conversión auto a m y casillas.
 export function alcanceTxt(a) {
-  if (a === 'T') return 'Toque (1,5 m · 1 casilla)';
+  if (a === 'T') return 'Toque (5 pies · 1,5 m · 1 casilla)';
   if (a === 'P') return 'Personal';
   if (typeof a !== 'number') return a || '—';
   const m = Math.round(a * 0.3048);
