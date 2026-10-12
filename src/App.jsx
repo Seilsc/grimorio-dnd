@@ -31,9 +31,13 @@ export default function App() {
   const [vis, setVis] = useState(() => Object.fromEntries([...SPELLS, ...CURAS].map((s) => [s.id, true])));
 
   const setClase = (c) => setStats((s) => ({ ...s, clase: c }));
-  const lista = spellsFor(stats.clase, modo, stats.nivelPJ);
+  // El mezclador Todos/Conjuros/Melé solo existe con "Todas las clases":
+  // con una clase concreta siempre ves todo lo usable (conjuros + melé filtrados).
+  const esTodas = stats.clase === 'todas';
+  const modoEf = esTodas ? modo : 'todos';
+  const lista = spellsFor(stats.clase, modoEf, stats.nivelPJ);
   const ids = lista.map((s) => s.id);
-  const ocultos = spellsFor(stats.clase, modo, null).length - lista.length;
+  const ocultos = spellsFor(stats.clase, modoEf, null).length - lista.length;
 
   // Niveles de espacio que el personaje puede usar (si no tiene, [1] de referencia).
   const maxSlot = stats.clase === 'todas' ? 9 : (espacioMaximo(stats.clase, stats.nivelPJ) ?? 9);
@@ -53,7 +57,7 @@ export default function App() {
         <ApartTabs active={apartado} onChange={setApartado} />
         {apartado === 'dano' && (
           <>
-            <Tabs active={tab} onChange={setTab} modo={modo} onModo={setModo} />
+            <Tabs active={tab} onChange={setTab} modo={modoEf} onModo={esTodas ? setModo : undefined} />
             {tab === 'mejor' && (
               <WinnerBoard nivel={nivelEf} setNivel={setNivel} stats={stats} ids={ids} ocultos={ocultos} niveles={niveles} maxSlot={maxSlot} />
             )}

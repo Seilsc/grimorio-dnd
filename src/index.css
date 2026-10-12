@@ -242,7 +242,7 @@ code {
 .chev.up { transform: rotate(180deg); }
 .inputs-grid { display: grid; grid-template-columns: 1fr; gap: 14px; padding: 14px 2px 0; }
 /* Hoja de personaje densa: filas siempre llenas, sin huecos */
-.char-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; align-items: end; }
+.char-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; align-items: start; }
 .scores-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0 10px; }
 .saves-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0 14px; }
 @media (max-width: 1000px) {
@@ -658,3 +658,26 @@ table.mini { width: 100%; border-collapse: collapse; font-size: 14px; margin-top
 .mini th, .mini td { border-bottom: 1px solid var(--bronze-dark); padding: 5px 6px; text-align: left; color: var(--ink); }
 .mini thead th { font-family: 'Cinzel', serif; font-size: 12px; }
 .mini tr.hl td { background: #8e1f1f18; font-weight: 700; }
+
+/* Tarjeta única del Grimorio: datos clave siempre visibles */
+.facts {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 7px 12px;
+  margin: 10px 0 4px; padding: 10px 12px;
+  background: #00000018; border: 1px solid var(--bronze-dark); border-radius: 6px;
+  box-shadow: inset 0 0 24px #8a6d2f33;
+}
+@media (max-width: 640px) { .facts { grid-template-columns: 1fr; } }
+.fact { display: flex; gap: 8px; align-items: baseline; margin: 0; font-size: 13.5px; }
+.fact dt {
+  display: inline-flex; align-items: center; gap: 5px; flex: none; min-width: 108px;
+  font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700;
+  color: var(--bronze-dark); letter-spacing: 0.4px;
+}
+.fact dd { margin: 0; color: var(--ink); }
+.spell-desc { font-size: 14.5px; color: var(--ink); margin: 9px 0 2px; }
+.spell-off { font-style: italic; }
+.spell-count { font-size: 13px; color: var(--muted); font-style: italic; }
+
+/* Barra de búsqueda del Grimorio */
+.grim-bar { display: flex; gap: 10px; align-items: center; margin: 12px 4px 0; }
+.grim-bar .uti-search { flex: 1; }

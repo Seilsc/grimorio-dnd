@@ -4,13 +4,14 @@ import {
 } from 'recharts';
 import {
   HeartPulse, Crown, Medal, Table2, BookOpen, Lightbulb, Swords,
-  TrendingUp, Maximize2, X, ArrowLeftRight, Info, ShieldAlert,
+  TrendingUp, Maximize2, X, ArrowLeftRight, Info, ShieldAlert, Search,
 } from 'lucide-react';
 import { curasFor, claseLabel, espacioMaximo } from '../data/spells.js';
+import { FICHAS } from '../data/fichas.js';
 import { curaDe, fmt, modLanz, caracLanzDe } from '../lib/damage.js';
 import SpellIcon from './SpellIcon.jsx';
 import SpellLink, { BookLink } from './SpellLink.jsx';
-import Ficha from './Ficha.jsx';
+import SpellCard from './SpellCard.jsx';
 import VisMenu from './VisMenu.jsx';
 import Tabs from './Tabs.jsx';
 import { Crown as CrownIcon, Swords as SwordsIcon, Table2 as Table2Icon, BookOpen as BookOpenIcon } from 'lucide-react';
@@ -182,6 +183,7 @@ function CuraChart({ stats, lista, vis, niveles }) {
 export default function Curacion({ stats, vis, setVis, niveles = [1, 2, 3, 4, 5, 6, 7, 8, 9] }) {
   const [nivel, setNivel] = useState(1);
   const [tab, setTab] = useState('mejor');
+  const [q, setQ] = useState('');
   // Solo lo alcanzable por tu clase y nivel (N1 → solo N1, etc.).
   const lista = curasFor(stats.clase, stats.nivelPJ);
   const ocultos = curasFor(stats.clase, null).length - lista.length;
@@ -190,6 +192,11 @@ export default function Curacion({ stats, vis, setVis, niveles = [1, 2, 3, 4, 5,
   const nivelEf = levels.includes(nivel) ? nivel : levels[levels.length - 1];
   const shownMap = vis ?? {};
   const shown = lista.filter((c) => shownMap[c.id] ?? true);
+  const buscadas = shown.filter((c) => {
+    if (!q.trim()) return true;
+    const hay = [c.nombre, FICHAS[c.id]?.o, FICHAS[c.id]?.e].filter(Boolean).join(' ').toLowerCase();
+    return q.toLowerCase().split(/\s+/).every((w) => hay.includes(w));
+  });
 
   const rank = (l) => lista
     .map((c) => ({ spec: c, ...curaDe(c, l, stats) }))
@@ -344,40 +351,43 @@ export default function Curacion({ stats, vis, setVis, niveles = [1, 2, 3, 4, 5,
         <>
           <VisMenu list={lista} vis={shownMap} setVis={setVis} />
           <h2 className="sub-h2"><BookOpen size={20} /> Fichas de curación</h2>
-      {shown.length === 0 && (
-        <div className="card"><p className="muted">Activa al menos una curación arriba para ver sus fichas.</p></div>
+          <div className="grim-bar">
+            <label className="uti-search">
+              <Search size={15} />
+              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar por nombre o escuela…" aria-label="Buscar curación" />
+            </label>
+            <span className="spell-count">{buscadas.length} de {lista.length}</span>
+          </div>
+      {buscadas.length === 0 && (
+        <div className="card"><p className="muted">Sin resultados: prueba con otro nombre o activa más curaciones arriba.</p></div>
       )}
       <div className="spell-grid">
-        {shown.map((c) => {
+        {buscadas.map((c) => {
           const r = curaDe(c, nivelEf, stats);
           return (
-            <article key={c.id} className="card spell-card">
-              <div className="spell-head">
-                <span className="spell-icon"><SpellIcon spell={{ ...c, color: '#4ade80', icon: c.icon }} size={30} /></span>
-                <div>
-                  <h3><SpellLink entry={c}>{c.nombre}</SpellLink></h3>
-                  <div className="spell-badges">
-                    <span className="badge">Nv {c.min}{c.min !== c.max ? `–${c.max}` : ''}</span>
-                    <BookLink libro={c.libro} />
-                  </div>
-                  <div className="muted small classes-line">{c.clases.map(claseLabel).join(' · ')}</div>
+            <SpellCard
+              key={c.id}
+              entry={c}
+              color="#4ade80"
+              badges={(
+                <>
+                  <span className="badge">Nv {c.min}{c.min !== c.max ? `–${c.max}` : ''}</span>
+                  {FICHAS[c.id]?.e && <span className="badge">{FICHAS[c.id].e}</span>}
+                  <BookLink libro={c.libro} />
+                </>
+              )}
+              stat={r.especial ? (
+                <div className="spell-dmg-row"><span className="muted small">{c.notas}</span></div>
+              ) : r.lanzable ? (
+                <div className="spell-dmg-row">
+                  <span className="spell-dmg">{fmt(r.dmg)}</span>
+                  <span className="muted small">a N{nivelEf} · {r.dados}</span>
                 </div>
-              </div>
-              <div className="spell-dmg-row">
-                {r.especial ? (
-                  <span className="muted small">{c.notas}</span>
-                ) : r.lanzable ? (
-                  <>
-                    <span className="spell-dmg">{fmt(r.dmg)}</span>
-                    <span className="muted small">a N{nivelEf} · {r.dados}</span>
-                  </>
-                ) : (
-                  <span className="muted">– <span className="small">Fuera de rango</span></span>
-                )}
-              </div>
-              {!r.especial && <p className="muted small">{c.notas}</p>}
-              <Ficha entry={c} subtitulo={`Nv ${c.min}${c.min !== c.max ? `–${c.max}` : ''} · ${r.dados}`} />
-            </article>
+              ) : (
+                <div className="spell-dmg-row"><span className="muted">– <span className="small">Fuera de rango</span></span></div>
+              )}
+              notas={!r.especial ? c.notas : null}
+            />
           );
         })}
       </div>

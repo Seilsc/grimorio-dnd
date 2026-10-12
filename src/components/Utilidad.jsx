@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Compass, Search } from 'lucide-react';
-import { UTILS, claseLabel } from '../data/spells.js';
-import SpellIcon from './SpellIcon.jsx';
-import SpellLink, { BookLink } from './SpellLink.jsx';
-import Ficha from './Ficha.jsx';
+import { UTILS } from '../data/spells.js';
+import { FICHAS } from '../data/fichas.js';
+import SpellCard from './SpellCard.jsx';
+import { BookLink } from './SpellLink.jsx';
 
 const TAGS = ['control', 'movimiento', 'exploración', 'social', 'información', 'defensa', 'sigilo', 'invocación', 'supervivencia'];
 
@@ -50,22 +50,20 @@ export default function Utilidad({ stats }) {
       )}
       <div className="spell-grid">
         {list.map((u) => (
-          <article key={u.id} className="card spell-card">
-            <div className="spell-head">
-              <span className="spell-icon"><SpellIcon spell={{ ...u, color: '#e8cf7a', icon: u.icon }} size={26} /></span>
-              <div>
-                <h3><SpellLink entry={u}>{u.nombre}</SpellLink></h3>
-                <div className="spell-badges">
-                  <span className="badge">{u.nivel === 0 ? 'Truco' : `Nv ${u.nivel}`}</span>
-                  <BookLink libro={u.libro} />
-                  {u.tags.map((t) => <span key={t} className="badge tag">{t}</span>)}
-                </div>
-                <div className="muted small classes-line">{u.clases.map(claseLabel).join(' · ')}</div>
-              </div>
-            </div>
-            <p className="muted small" style={{ marginTop: 8 }}>{u.desc}</p>
-            <Ficha entry={u} subtitulo={u.nivel === 0 ? 'Truco' : `Nivel ${u.nivel}`} />
-          </article>
+          <SpellCard
+            key={u.id}
+            entry={u}
+            color="#e8cf7a"
+            badges={(
+              <>
+                <span className="badge">{u.nivel === 0 ? 'Truco' : `Nv ${u.nivel}`}</span>
+                {FICHAS[u.id]?.e && <span className="badge">{FICHAS[u.id].e}</span>}
+                <BookLink libro={u.libro} />
+                {u.tags.map((t) => <span key={t} className="badge tag">{t}</span>)}
+              </>
+            )}
+            desc={<p className="muted small" style={{ marginTop: 8 }}>{u.desc}</p>}
+          />
         ))}
       </div>
     </section>
