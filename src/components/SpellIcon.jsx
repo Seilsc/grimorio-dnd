@@ -12,6 +12,7 @@ import {
   Archive, Phone, Link, Users, Trees, Image, Network, Box, Megaphone,
   Layers, Search, Leaf, Drumstick, Cross, Sprout, Smile, ScrollText,
   Cat, House, Cable, DoorOpen, AlarmClock, CloudSun, VenetianMask,
+  Shield, ShieldCheck, Sparkles, Repeat, Hourglass,
 } from 'lucide-react';
 
 const MAP = {
@@ -28,6 +29,7 @@ const MAP = {
   Archive, Phone, Link, Users, Trees, Image, Network, Box, Megaphone,
   Layers, Search, Leaf, Drumstick, Cross, Sprout, Smile, ScrollText,
   Cat, House, Cable, DoorOpen, AlarmClock, CloudSun, VenetianMask,
+  Shield, ShieldCheck, Sparkles, Repeat, Hourglass,
 };
 
 /**

@@ -5,6 +5,7 @@ import { FICHAS } from '../data/fichas.js';
 import { spellDamage, fmt } from '../lib/damage.js';
 import { BookLink } from './SpellLink.jsx';
 import SpellCard from './SpellCard.jsx';
+import Leyenda from './Leyenda.jsx';
 
 const FILTROS = [
   { id: 'todos', label: 'Todos' },
@@ -70,8 +71,6 @@ export default function SpellGrid({ stats, nivel, spells, niveles = [1, 2, 3, 4,
                 <>
                   <span className="badge">{s.tiradaLabel}</span>
                   <span className="badge dmg" style={{ '--c': s.color }}>{s.tipoDano}</span>
-                  <span className="badge lvl">Nv {s.nivelMin}{s.nivelMin !== s.nivelMax ? `–${s.nivelMax}` : ''}</span>
-                  {FICHAS[s.id]?.e && <span className="badge">{FICHAS[s.id].e}</span>}
                   <BookLink libro={s.libro} />
                 </>
               )}
@@ -115,6 +114,7 @@ export default function SpellGrid({ stats, nivel, spells, niveles = [1, 2, 3, 4,
           );
         })}
       </div>
+      <Leyenda />
     </section>
   );
 }

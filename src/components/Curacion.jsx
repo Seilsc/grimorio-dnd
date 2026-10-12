@@ -12,6 +12,7 @@ import { curaDe, fmt, modLanz, caracLanzDe } from '../lib/damage.js';
 import SpellIcon from './SpellIcon.jsx';
 import SpellLink, { BookLink } from './SpellLink.jsx';
 import SpellCard from './SpellCard.jsx';
+import Leyenda from './Leyenda.jsx';
 import VisMenu from './VisMenu.jsx';
 import Tabs from './Tabs.jsx';
 import { Crown as CrownIcon, Swords as SwordsIcon, Table2 as Table2Icon, BookOpen as BookOpenIcon } from 'lucide-react';
@@ -370,11 +371,7 @@ export default function Curacion({ stats, vis, setVis, niveles = [1, 2, 3, 4, 5,
               entry={c}
               color="#4ade80"
               badges={(
-                <>
-                  <span className="badge">Nv {c.min}{c.min !== c.max ? `–${c.max}` : ''}</span>
-                  {FICHAS[c.id]?.e && <span className="badge">{FICHAS[c.id].e}</span>}
-                  <BookLink libro={c.libro} />
-                </>
+                <BookLink libro={c.libro} />
               )}
               stat={r.especial ? (
                 <div className="spell-dmg-row"><span className="muted small">{c.notas}</span></div>
@@ -391,6 +388,7 @@ export default function Curacion({ stats, vis, setVis, niveles = [1, 2, 3, 4, 5,
           );
         })}
       </div>
+      <Leyenda />
         </>
       )}
     </section>

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Compass, Search } from 'lucide-react';
 import { UTILS } from '../data/spells.js';
-import { FICHAS } from '../data/fichas.js';
 import SpellCard from './SpellCard.jsx';
 import { BookLink } from './SpellLink.jsx';
 
@@ -56,8 +55,6 @@ export default function Utilidad({ stats }) {
             color="#e8cf7a"
             badges={(
               <>
-                <span className="badge">{u.nivel === 0 ? 'Truco' : `Nv ${u.nivel}`}</span>
-                {FICHAS[u.id]?.e && <span className="badge">{FICHAS[u.id].e}</span>}
                 <BookLink libro={u.libro} />
                 {u.tags.map((t) => <span key={t} className="badge tag">{t}</span>)}
               </>
