@@ -4,14 +4,17 @@ import { attackBonus, spellDC, modLanz, compDe, duel, fmt } from '../lib/damage.
 import SpellIcon from './SpellIcon.jsx';
 import SpellLink from './SpellLink.jsx';
 
-function DuelCard({ R, side, isWinner, onPick, max }) {
+function DuelCard({ R, side, isWinner, onPick, max, opciones }) {
+  const list = opciones ?? SPELLS;
+  // La selección actual siempre visible aunque deje de ser alcanzable (muestra el motivo).
+  const opts = list.some((s) => s.id === R.spell.id) ? list : [R.spell, ...list];
   return (
     <div className={`card duel-card ${isWinner ? 'duel-win' : ''}`}>
       {isWinner && <div className="duel-crown"><Crown size={14} /> Ganador</div>}
       <div className="duel-pick">
         <SpellIcon spell={R.spell} size={20} />
         <select value={R.spell.id} onChange={(e) => onPick(e.target.value)} aria-label="Elegir conjuro">
-          {SPELLS.map((s) => (
+          {opts.map((s) => (
             <option key={s.id} value={s.id}>{s.nombre} (Nv {s.nivelMin}{s.nivelMin !== s.nivelMax ? `–${s.nivelMax}` : ''})</option>
           ))}
         </select>
@@ -36,7 +39,7 @@ function DuelCard({ R, side, isWinner, onPick, max }) {
   );
 }
 
-export default function DuelArena({ aId, bId, setAId, setBId, nivel, setNivel, stats, niveles = [1, 2, 3, 4, 5, 6, 7, 8, 9] }) {
+export default function DuelArena({ aId, bId, setAId, setBId, nivel, setNivel, stats, niveles = [1, 2, 3, 4, 5, 6, 7, 8, 9], spells }) {
   const { A, B, ganador, diff, pct } = duel(aId, bId, nivel, stats);
   const max = Math.max(A.dmg ?? 0, B.dmg ?? 0, 0.01);
   const bonoD = attackBonus(modLanz(stats), compDe(stats));
@@ -67,9 +70,9 @@ export default function DuelArena({ aId, bId, setAId, setBId, nivel, setNivel, s
         </div>
       </div>
       <div className="duel-grid">
-        <DuelCard R={A} side="A" isWinner={ganador === 'A'} onPick={setAId} max={max} />
+        <DuelCard R={A} side="A" isWinner={ganador === 'A'} onPick={setAId} max={max} opciones={spells} />
         <div className="vs">VS</div>
-        <DuelCard R={B} side="B" isWinner={ganador === 'B'} onPick={setBId} max={max} />
+        <DuelCard R={B} side="B" isWinner={ganador === 'B'} onPick={setBId} max={max} opciones={spells} />
       </div>
       <div className="card verdict">{verdict()}</div>
       <p className="muted small">El duelo usa tus datos actuales (bono +{bonoD}, CD {cdD}, CA {stats.ca}). Cambia arriba y el duelo se recalcula.</p>

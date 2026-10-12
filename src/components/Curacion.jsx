@@ -6,7 +6,7 @@ import {
   HeartPulse, Crown, Medal, Table2, BookOpen, Lightbulb, Swords,
   TrendingUp, Maximize2, X, ArrowLeftRight, Info, ShieldAlert,
 } from 'lucide-react';
-import { CURAS, claseLabel } from '../data/spells.js';
+import { curasFor, claseLabel, espacioMaximo } from '../data/spells.js';
 import { curaDe, fmt, modLanz, caracLanzDe } from '../lib/damage.js';
 import SpellIcon from './SpellIcon.jsx';
 import SpellLink, { BookLink } from './SpellLink.jsx';
@@ -34,11 +34,6 @@ const WARN_CURA = {
   'c-espiritu': 'Requiere concentración; sana al pasar por el espíritu.',
   'c-ayuda': 'Sube también el máximo: no desperdicies el exceso.',
 };
-
-function curasDe(clase) {
-  if (!clase || clase === 'todas') return CURAS;
-  return CURAS.filter((c) => c.clases.includes(clase));
-}
 
 function explainCura(best, second, stats) {
   const out = [];
@@ -94,7 +89,7 @@ function CuraDuel({ stats, nivel, lista }) {
   const ids = lista.filter((c) => !c.especial).map((c) => c.id);
   const [aId, setAId] = useState(ids[0] ?? null);
   const [bId, setBId] = useState(ids[1] ?? ids[0] ?? null);
-  if (!ids.length) return null;
+  if (!ids.length) return <div className="card"><p className="muted">Sin curaciones comparables con tu clase y nivel.</p></div>;
   const A = lista.find((c) => c.id === aId) ?? lista[0];
   const B = lista.find((c) => c.id === bId) ?? lista[1] ?? lista[0];
   const ra = curaDe(A, nivel, stats);
@@ -187,8 +182,12 @@ function CuraChart({ stats, lista, vis, niveles }) {
 export default function Curacion({ stats, vis, setVis, niveles = [1, 2, 3, 4, 5, 6, 7, 8, 9] }) {
   const [nivel, setNivel] = useState(1);
   const [tab, setTab] = useState('mejor');
-  const lista = curasDe(stats.clase);
+  // Solo lo alcanzable por tu clase y nivel (N1 → solo N1, etc.).
+  const lista = curasFor(stats.clase, stats.nivelPJ);
+  const ocultos = curasFor(stats.clase, null).length - lista.length;
+  const espMax = !stats.clase || stats.clase === 'todas' ? null : espacioMaximo(stats.clase, stats.nivelPJ);
   const levels = niveles;
+  const nivelEf = levels.includes(nivel) ? nivel : levels[levels.length - 1];
   const shownMap = vis ?? {};
   const shown = lista.filter((c) => shownMap[c.id] ?? true);
 
@@ -197,7 +196,7 @@ export default function Curacion({ stats, vis, setVis, niveles = [1, 2, 3, 4, 5,
     .filter((r) => r.lanzable && !r.especial)
     .sort((a, b) => b.dmg - a.dmg);
   const best = (l) => rank(l)[0] ?? null;
-  const top = rank(nivel).slice(0, 5);
+  const top = rank(nivelEf).slice(0, 5);
   const second = top[1] ?? null;
   const first = top[0] ?? null;
   const maxTop = first?.dmg || 1;
@@ -208,6 +207,15 @@ export default function Curacion({ stats, vis, setVis, niveles = [1, 2, 3, 4, 5,
         <h2><HeartPulse size={20} /> Quién cura más por nivel de espacio</h2>
       </div>
       <p className="muted small">Curación media por objetivo (dados + tu modificador). Sin tiradas ni resistencias.</p>
+      {ocultos > 0 && (
+        <p className="muted small">
+          Tu {claseLabel(stats.clase)} de nv. {stats.nivelPJ}{' '}
+          {espMax > 0 ? <>solo llega a espacios de N{espMax}</> : 'aún no tiene espacios de conjuro'}: {ocultos} curación{ocultos > 1 ? 'es' : ''} oculta{ocultos > 1 ? 's' : ''}. Sube de nivel para ver más.
+        </p>
+      )}
+      {lista.length === 0 && (
+        <div className="card"><p className="muted">Nada disponible: tu clase y nivel no llegan a ninguna curación. Cambia de clase o sube de nivel.</p></div>
+      )}
       <Tabs active={tab} onChange={setTab} items={CURA_TABS} />
 
       {tab === 'mejor' && (
@@ -218,7 +226,7 @@ export default function Curacion({ stats, vis, setVis, niveles = [1, 2, 3, 4, 5,
           return (
             <button
               key={l}
-              className={`podium-cell ${l === nivel ? 'active' : ''}`}
+              className={`podium-cell ${l === nivelEf ? 'active' : ''}`}
               onClick={() => setNivel(l)}
               title={b ? `${b.spec.nombre}: ${fmt(b.dmg)}` : `Nivel ${l}: sin curación`}
             >
@@ -236,7 +244,7 @@ export default function Curacion({ stats, vis, setVis, niveles = [1, 2, 3, 4, 5,
 
       <div className="winner-grid" style={{ marginTop: 12 }}>
         <div className="card winner">
-          <div className="winner-crown"><Crown size={18} /> Nivel {nivel}</div>
+          <div className="winner-crown"><Crown size={18} /> Nivel {nivelEf}</div>
           {first ? (
             <>
               <div className="winner-name"><SpellIcon spell={{ ...first.spec, color: '#4ade80', icon: first.spec.icon }} size={26} /> {first.spec.nombre}</div>
@@ -260,7 +268,7 @@ export default function Curacion({ stats, vis, setVis, niveles = [1, 2, 3, 4, 5,
 
       {top.length > 0 && (
         <div className="card top5">
-          <h3><Crown size={16} /> Las 5 mejores a nivel {nivel}</h3>
+          <h3><Crown size={16} /> Las 5 mejores a nivel {nivelEf}</h3>
           {top.map((t, i) => (
             <div key={t.spec.id} className="top5-row">
               <span className="top5-pos">{i + 1}.</span>
@@ -289,7 +297,7 @@ export default function Curacion({ stats, vis, setVis, niveles = [1, 2, 3, 4, 5,
       )}
 
       {tab === 'duelo' && (
-        <CuraDuel stats={stats} nivel={nivel} lista={lista} />
+        <CuraDuel stats={stats} nivel={nivelEf} lista={lista} />
       )}
 
       {tab === 'tabla' && (
@@ -334,10 +342,14 @@ export default function Curacion({ stats, vis, setVis, niveles = [1, 2, 3, 4, 5,
 
       {tab === 'grimorio' && (
         <>
+          <VisMenu list={lista} vis={shownMap} setVis={setVis} />
           <h2 className="sub-h2"><BookOpen size={20} /> Fichas de curación</h2>
+      {shown.length === 0 && (
+        <div className="card"><p className="muted">Activa al menos una curación arriba para ver sus fichas.</p></div>
+      )}
       <div className="spell-grid">
-        {lista.map((c) => {
-          const r = curaDe(c, nivel, stats);
+        {shown.map((c) => {
+          const r = curaDe(c, nivelEf, stats);
           return (
             <article key={c.id} className="card spell-card">
               <div className="spell-head">
@@ -357,7 +369,7 @@ export default function Curacion({ stats, vis, setVis, niveles = [1, 2, 3, 4, 5,
                 ) : r.lanzable ? (
                   <>
                     <span className="spell-dmg">{fmt(r.dmg)}</span>
-                    <span className="muted small">a N{nivel} · {r.dados}</span>
+                    <span className="muted small">a N{nivelEf} · {r.dados}</span>
                   </>
                 ) : (
                   <span className="muted">– <span className="small">Fuera de rango</span></span>

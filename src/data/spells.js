@@ -229,6 +229,20 @@ export function usablePor(entry, clase, nivelPJ) {
   return max != null && max > 0 && entry.nivelMin <= max;
 }
 
+// Curaciones disponibles por clase y nivel de personaje (como spellsFor pero
+// para CURAS). min = espacio mínimo necesario; las de reserva por nivel
+// (fijoPJ/dadosPJ, p. ej. Imposición de manos) no gastan espacio y valen
+// siempre que la clase cuadre. Con 'todas' no se filtra por nivel.
+export function curasFor(clase, nivelPJ = null) {
+  const base = (!clase || clase === 'todas')
+    ? [...CURAS]
+    : CURAS.filter((c) => c.clases.includes(clase));
+  if (nivelPJ == null || !clase || clase === 'todas') return base;
+  const max = espacioMaximo(clase, nivelPJ);
+  if (max == null) return base;
+  return base.filter((c) => c.fijoPJ || c.dadosPJ || (c.min ?? 1) <= max);
+}
+
 // Slugs oficiales en inglés (D&D Beyond, sitio oficial de D&D).
 export const DDB_SPELL = {
   'bola-fuego': 'fireball', 'causar-heridas': 'inflict-wounds', 'cuchillo-hielo': 'ice-knife',

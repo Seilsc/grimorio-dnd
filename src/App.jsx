@@ -60,7 +60,7 @@ export default function App() {
             {tab === 'duelo' && (
               <DuelArena
                 aId={aId} bId={bId} setAId={setAId} setBId={setBId}
-                nivel={nivelEf} setNivel={setNivel} stats={stats} niveles={niveles}
+                nivel={nivelEf} setNivel={setNivel} stats={stats} niveles={niveles} spells={lista}
               />
             )}
             {tab === 'tabla' && (
